@@ -64,7 +64,7 @@ function ScrambleGenerator5x5() {
     randomIndex = Math.floor(Math.random() * move5x5x5.length)
     do {
       randomIndex = Math.floor(Math.random() * move5x5x5.length)
-    } while (!checkValidBigCubeNextMove(move5x5x5[randomIndex], move5x5x5[lastMoveIndex], move5x5x5[lastPrevIndex]))
+    } while (!checkValidNextMove(move5x5x5[randomIndex], move5x5x5[lastMoveIndex], move5x5x5[lastPrevIndex]))
     scramble += move5x5x5[randomIndex] + " "
     lastPrevIndex = lastMoveIndex
     lastMoveIndex = randomIndex

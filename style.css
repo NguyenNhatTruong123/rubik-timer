@@ -137,21 +137,22 @@
 }
 
 #displayTime {
-    width: 310px;
-    height: 100px;
-    font-size: 7em;
+    /* width: 310px; */
+    /* height: 100px; */
+    font-size: 10em;
     margin-left: 10%;
     font-family: "Archivo Black", sans-serif;
     user-select: none;
 }
 
 .display-time-container {
-    width: 50vw;
-    height: 20vw;
+    /* width: 50vw; */
+    /* height: 20vw; */
     display: flex;
     justify-content: center;
     align-items: center;
     /* background-color: red; */
+    margin: auto;
 }
 
 .footer-container {
@@ -160,23 +161,16 @@
     /* margin-bottom: 2rem; */
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: start;
 }
 
-.footer-container #stats {
-    width: 270px;
-    height: 120px;
+.split-right #stats {
+    width: 200px;
     text-align: center;
-    text-transform: uppercase;
     font-family: "Yusei Magic", sans-serif;
     letter-spacing: 2px;
-    background-color: #f04e3e;
-    color: whitesmoke;
-    cursor: pointer;
-    position: relative;
-    border-radius: 5px;
-    outline: none;
-    user-select: none;
+    background-color: brown;
+    border-radius: 15px;
 }
 
 .footer-container #stats .stats-content {
@@ -187,6 +181,7 @@
     transform: translate(-50%, -50%);
     width: 100%;
     user-select: none;
+    margin: auto;
 }
 
 .footer-container #stats:hover {
@@ -404,11 +399,11 @@ a:focus {
     }
 }
 
-#timeResult {
+.timeResult {
     font-size: 20px;
 }
 
-#timeResult:hover {
+.timeResult:hover {
     background-color: lightgray;
     cursor: grab;
     font-size: 20px;

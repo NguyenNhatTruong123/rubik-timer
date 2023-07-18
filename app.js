@@ -19,14 +19,10 @@ var splitLeft = document.querySelector(".split-left");
 var puzzleSelect;
 var savedTimes;
 // new variables stats
-var csTimes = [];
-var avAll = 0;
-var avAllOut = document.getElementById("overallAv");
-var best = 999999999999999999;
-var bestOut = document.getElementById("fastest");
-var worst = 0;
+var averageOf5 = document.getElementById("ao5");
+var averageOf12 = document.getElementById("ao12");
+var bestOut = document.getElementById("best");
 var numSolves = 0;
-var total = 0;
 var numSolvesOut = document.querySelector(".solveNum");
 
 // ends here
@@ -41,10 +37,14 @@ var second = 0;
 var minute = 0;
 var cs = 0;
 
-var csTimes = [];
 let interval;
 
 var currentScramble = ""
+
+var sumOf5 = 0
+var sumOf12 = 0
+
+var cube;
 
 function timer() {
   milliSec++;
@@ -106,27 +106,29 @@ function run() {
     clearInterval(interval);
 
     let timeElement = document.createElement("span")
-    timeElement.id = "timeResult"
+    timeElement.className = "timeResult"
+    timeElement.id = DATA_RESULTS[puzzleSelect]["scramble"].length
     timeList.appendChild(timeElement)
     timeElement.innerText = " " + displayTime.innerText.split(" ").join("") + " "
-    timeElement.setAttribute('href', "#");
 
-    timeElement.addEventListener("click", function () {
-      alert(currentScramble)
+    timeElement.addEventListener("click", function (e) {
+      createResultDialog(e.target.id)
     })
 
-    csTimes.push(cs);
+    createResultList()
     calculateStats();
     timeList.scrollTop = timeList.scrollHeight;
-
-    createResultList()
     scrambleGenerator()
   }
 }
 
+function createResultDialog(id) {
+  alert(DATA_RESULTS[puzzleSelect]["scramble"][[id]])
+}
+
 function createResultList() {
   let resultTime = displayTime.innerText.split(" ").join("")
-  DATA_RESULTS[puzzleSelect]["timeList"].push(resultTime)
+  DATA_RESULTS[puzzleSelect]["timeList"].push(parseFloat(resultTime))
   DATA_RESULTS[puzzleSelect]["scramble"].push(currentScramble)
 }
 
@@ -134,24 +136,23 @@ function scrambleGenerator() {
   switch (puzzleSelect) {
     case CUBE_2X2X2:
       ScrambleGenerator2x2();
+      cube = new Cube("2x2x2")
       break;
     case CUBE_3X3X3:
       ScrambleGenerator3x3();
+      cube = new Cube("3x3x3")
       break;
     case CUBE_4X4X4:
       ScrambleGenerator4x4();
+      cube = new Cube("4x4x4")
       break;
     case CUBE_5X5X5:
       ScrambleGenerator5x5();
+      cube = new Cube("5x5x5")
       break;
-    // case "6":
-    //   pyraminx();
-    //   break;
-    // case "7":
-    //   skewb();
-    //   break;
     default:
       ScrambleGenerator3x3();
+      cube = new Cube("3x3x3")
       puzzleSelect = 3
   }
 
@@ -183,14 +184,6 @@ puzzle.addEventListener("change", function () {
     ScrambleGenerator5x5();
     puzzleSelected.textContent = "5x5x5";
   }
-  // if (puzzleSelect === "6") {
-  //   pyraminx();
-  //   puzzleSelected.textContent = "PYRAMINX";
-  // }
-  // if (puzzleSelect === "7") {
-  //   skewb();
-  //   puzzleSelected.textContent = "SKEWB";
-  // }
 });
 
 clearAll.addEventListener("click", function () {
@@ -199,40 +192,43 @@ clearAll.addEventListener("click", function () {
 
 // clear times function
 function clearTimes() {
-  csTimes = [];
   timeDisplay = [];
-  localStorage.clear();
   timeList.innerHTML = timeDisplay;
   numSolves = 0;
   numSolvesOut.innerHTML = "Solves: " + numSolves;
-  best = 99999999999;
   bestOut.innerHTML = "Best: ";
-  worst = 0;
-  avAll = 0;
-  total = 0;
   avAllOut.innerHTML = "Average: ";
+
+  cube.clearAll()
 }
 
 //stats
 function calculateStats() {
   numSolves++;
-  total = 0;
   numSolvesOut.innerHTML = "Solves: " + numSolves;
-  for (var x = 0; x < csTimes.length; x++) {
-    if (csTimes[x] < best) {
-      best = csTimes[x];
-    }
-    if (csTimes[x] > worst) {
-      worst = csTimes[x];
-    }
-    total += csTimes[x];
+
+  let start = numSolves - 1
+  let currentTime = DATA_RESULTS[puzzleSelect]["timeList"][start]
+  if (currentTime < DATA_RESULTS[puzzleSelect]["best"]) DATA_RESULTS[puzzleSelect]["best"] = currentTime
+  if (currentTime > DATA_RESULTS[puzzleSelect]["worst"]) DATA_RESULTS[puzzleSelect]["worst"] = currentTime
+  bestOut.innerHTML = "Best: " + DATA_RESULTS[puzzleSelect]["best"]
+
+  sumOf12 += currentTime
+  sumOf5 += currentTime
+
+  if (numSolves >= 5) {
+    if (DATA_RESULTS[puzzleSelect]["timeList"][numSolves - 6]) sumOf5 -= DATA_RESULTS[puzzleSelect]["timeList"][numSolves - 6]
+    var average = (sumOf5 - DATA_RESULTS[puzzleSelect]["best"] - DATA_RESULTS[puzzleSelect]["worst"]) / 3
+    DATA_RESULTS[puzzleSelect]["averageOf5"] = Math.round(average * 100) / 100
+    averageOf5.innerHTML = "Ao5: " + DATA_RESULTS[puzzleSelect]["averageOf5"]
   }
-  avAll = formatTime(total / numSolves);
-  best = formatTime(best)
-  avAllOut.innerHTML = "Average: " + avAll;
-  bestOut.innerHTML = "Best: " + best;
-  DATA_RESULTS[puzzleSelect]["best"] = best
-  DATA_RESULTS[puzzleSelect]["average"] = avAll
+  if (numSolves >= 12) {
+    if (DATA_RESULTS[puzzleSelect]["timeList"][numSolves - 13]) sumOf5 -= DATA_RESULTS[puzzleSelect]["timeList"][numSolves - 13]
+    var average = (sumOf5 - DATA_RESULTS[puzzleSelect]["best"] - DATA_RESULTS[puzzleSelect]["worst"]) / 10
+    DATA_RESULTS[puzzleSelect]["averageOf12"] = Math.round(average * 100) / 100
+    averageOf12.innerHTML = "Ao12: " + DATA_RESULTS[puzzleSelect]["averageOf12"]
+  }
+
 }
 
 function formatTime(t) {
