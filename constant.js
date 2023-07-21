@@ -1,7 +1,7 @@
-const CUBE_2X2X2 = 2
-const CUBE_3X3X3 = 3
-const CUBE_4X4X4 = 4
-const CUBE_5X5X5 = 5
+const CUBE_2X2X2 = "2x2x2"
+const CUBE_3X3X3 = "3x3x3"
+const CUBE_4X4X4 = "4x4x4"
+const CUBE_5X5X5 = "5x5x5"
 
 const move2x2x2 = ["R", "U", "F", "R'", "U'", "F'", "R2", "U2", "F2"]
 const move3x3x3 = ["R", "L", "U", "D", "F", "B", "R'", "L'", "U'", "D'", "F'", "B'", "R2", "L2", "U2", "D2", "F2", "B2"]

@@ -17,6 +17,7 @@ var splitRight = document.querySelector(".split-right");
 var splitLeft = document.querySelector(".split-left");
 
 var puzzleSelect;
+var currentPuzzle;
 var savedTimes;
 // new variables stats
 var averageOf5 = document.getElementById("ao5");
@@ -29,7 +30,7 @@ var numSolvesOut = document.querySelector(".solveNum");
 
 var timeDisplay = [];
 
-scrambleGenerator()
+scrambleGenerator(isNewSession = true)
 
 var running = false;
 var milliSec = 0;
@@ -44,7 +45,7 @@ var currentScramble = ""
 var sumOf5 = 0
 var sumOf12 = 0
 
-var cube;
+var cubeTimer;
 
 function timer() {
   milliSec++;
@@ -107,7 +108,8 @@ function run() {
 
     let timeElement = document.createElement("span")
     timeElement.className = "timeResult"
-    timeElement.id = DATA_RESULTS[puzzleSelect]["scramble"].length
+    // timeElement.id = DATA_RESULTS[puzzleSelect]["scramble"].length
+    timeElement.id = cubeTimer.scrambleList.length
     timeList.appendChild(timeElement)
     timeElement.innerText = " " + displayTime.innerText.split(" ").join("") + " "
 
@@ -118,7 +120,7 @@ function run() {
     createResultList()
     calculateStats();
     timeList.scrollTop = timeList.scrollHeight;
-    scrambleGenerator()
+    scrambleGenerator(isNewSession = false)
   }
 }
 
@@ -128,33 +130,32 @@ function createResultDialog(id) {
 
 function createResultList() {
   let resultTime = displayTime.innerText.split(" ").join("")
-  DATA_RESULTS[puzzleSelect]["timeList"].push(parseFloat(resultTime))
-  DATA_RESULTS[puzzleSelect]["scramble"].push(currentScramble)
+  // DATA_RESULTS[puzzleSelect]["timeList"].push(parseFloat(resultTime))
+  // DATA_RESULTS[puzzleSelect]["scramble"].push(currentScramble)
+  cubeTimer.timeList.push(parseFloat(resultTime))
+  cubeTimer.scrambleList.push(currentScramble)
 }
 
-function scrambleGenerator() {
+function scrambleGenerator(isNewSession) {
   switch (puzzleSelect) {
     case CUBE_2X2X2:
       ScrambleGenerator2x2();
-      cube = new Cube("2x2x2")
       break;
     case CUBE_3X3X3:
       ScrambleGenerator3x3();
-      cube = new Cube("3x3x3")
       break;
     case CUBE_4X4X4:
       ScrambleGenerator4x4();
-      cube = new Cube("4x4x4")
       break;
     case CUBE_5X5X5:
       ScrambleGenerator5x5();
-      cube = new Cube("5x5x5")
       break;
     default:
       ScrambleGenerator3x3();
-      cube = new Cube("3x3x3")
-      puzzleSelect = 3
+      puzzleSelect = CUBE_3X3X3
   }
+  currentPuzzle = puzzleSelect
+  if (isNewSession) cubeTimer = new CubeTimer(puzzleSelect)
 
 }
 
@@ -167,23 +168,29 @@ function puzzle_select() {
 }
 
 puzzle.addEventListener("change", function () {
+  if (localStorage) {
+    cubeTimer = localStorage.getItem(currentPuzzle)
+  }
   timeList.innerText = ""
   if (puzzleSelect === CUBE_2X2X2) {
     ScrambleGenerator2x2();
-    puzzleSelected.textContent = "2x2x2";
+    puzzleSelected.textContent = CUBE_2X2X2;
   }
   if (puzzleSelect === CUBE_3X3X3) {
     ScrambleGenerator3x3();
-    puzzleSelected.textContent = "3x3x3";
+    puzzleSelected.textContent = CUBE_3X3X3;
   }
   if (puzzleSelect === CUBE_4X4X4) {
     ScrambleGenerator4x4();
-    puzzleSelected.textContent = "4x4x4";
+    puzzleSelected.textContent = CUBE_4X4X4;
   }
   if (puzzleSelect === CUBE_5X5X5) {
     ScrambleGenerator5x5();
-    puzzleSelected.textContent = "5x5x5";
+    puzzleSelected.textContent = CUBE_5X5X5;
   }
+  storeValue()
+
+  currentPuzzle = puzzleSelect
 });
 
 clearAll.addEventListener("click", function () {
@@ -199,7 +206,7 @@ function clearTimes() {
   bestOut.innerHTML = "Best: ";
   avAllOut.innerHTML = "Average: ";
 
-  cube.clearAll()
+  cubeTimer.clearAll()
 }
 
 //stats
@@ -208,25 +215,37 @@ function calculateStats() {
   numSolvesOut.innerHTML = "Solves: " + numSolves;
 
   let start = numSolves - 1
-  let currentTime = DATA_RESULTS[puzzleSelect]["timeList"][start]
-  if (currentTime < DATA_RESULTS[puzzleSelect]["best"]) DATA_RESULTS[puzzleSelect]["best"] = currentTime
-  if (currentTime > DATA_RESULTS[puzzleSelect]["worst"]) DATA_RESULTS[puzzleSelect]["worst"] = currentTime
-  bestOut.innerHTML = "Best: " + DATA_RESULTS[puzzleSelect]["best"]
+  // let currentTime = DATA_RESULTS[puzzleSelect]["timeList"][start]
+  // if (currentTime < DATA_RESULTS[puzzleSelect]["best"]) DATA_RESULTS[puzzleSelect]["best"] = currentTime
+  // if (currentTime > DATA_RESULTS[puzzleSelect]["worst"]) DATA_RESULTS[puzzleSelect]["worst"] = currentTime
+  let currentTime = cubeTimer.timeList[start]
+  if (currentTime < cubeTimer.bestSingle) cubeTimer.bestSingle = currentTime
+  if (currentTime > cubeTimer.worstSingle) cubeTimer.worstSingle = currentTime
+  // bestOut.innerHTML = "Best: " + DATA_RESULTS[puzzleSelect]["best"]
+  bestOut.innerHTML = "Best: " + cubeTimer.bestSingle
 
   sumOf12 += currentTime
   sumOf5 += currentTime
 
   if (numSolves >= 5) {
-    if (DATA_RESULTS[puzzleSelect]["timeList"][numSolves - 6]) sumOf5 -= DATA_RESULTS[puzzleSelect]["timeList"][numSolves - 6]
-    var average = (sumOf5 - DATA_RESULTS[puzzleSelect]["best"] - DATA_RESULTS[puzzleSelect]["worst"]) / 3
-    DATA_RESULTS[puzzleSelect]["averageOf5"] = Math.round(average * 100) / 100
-    averageOf5.innerHTML = "Ao5: " + DATA_RESULTS[puzzleSelect]["averageOf5"]
+    // if (DATA_RESULTS[puzzleSelect]["timeList"][numSolves - 6]) sumOf5 -= DATA_RESULTS[puzzleSelect]["timeList"][numSolves - 6]
+    // var average = (sumOf5 - DATA_RESULTS[puzzleSelect]["best"] - DATA_RESULTS[puzzleSelect]["worst"]) / 3
+    // DATA_RESULTS[puzzleSelect]["averageOf5"] = Math.round(average * 100) / 100
+    // averageOf5.innerHTML = "Ao5: " + DATA_RESULTS[puzzleSelect]["averageOf5"]
+    if (cubeTimer.timeList[numSolves - 6]) sumOf5 -= cubeTimer.timeList[numSolves - 6]
+    var average = (sumOf5 - cubeTimer.bestSingle - cubeTimer.worstSingle) / 3
+    cubeTimer.averageOf5 = Math.round(average * 100) / 100
+    averageOf5.innerHTML = "Ao5: " + cubeTimer.averageOf5
   }
   if (numSolves >= 12) {
-    if (DATA_RESULTS[puzzleSelect]["timeList"][numSolves - 13]) sumOf5 -= DATA_RESULTS[puzzleSelect]["timeList"][numSolves - 13]
-    var average = (sumOf5 - DATA_RESULTS[puzzleSelect]["best"] - DATA_RESULTS[puzzleSelect]["worst"]) / 10
-    DATA_RESULTS[puzzleSelect]["averageOf12"] = Math.round(average * 100) / 100
-    averageOf12.innerHTML = "Ao12: " + DATA_RESULTS[puzzleSelect]["averageOf12"]
+    // if (DATA_RESULTS[puzzleSelect]["timeList"][numSolves - 13]) sumOf5 -= DATA_RESULTS[puzzleSelect]["timeList"][numSolves - 13]
+    // var average = (sumOf5 - DATA_RESULTS[puzzleSelect]["best"] - DATA_RESULTS[puzzleSelect]["worst"]) / 10
+    // DATA_RESULTS[puzzleSelect]["averageOf12"] = Math.round(average * 100) / 100
+    // averageOf12.innerHTML = "Ao12: " + DATA_RESULTS[puzzleSelect]["averageOf12"]
+    if (cubeTimer.timeList[numSolves - 13]) sumOf12 -= cubeTimer.timeList[numSolves - 13]
+    var average = (sumOf12 - cubeTimer.bestSingle - cubeTimer.worstSingle) / 10
+    cubeTimer.averageOf12 = Math.round(average * 100) / 100
+    averageOf12.innerHTML = "Ao12: " + cubeTimer.averageOf12
   }
 
 }
@@ -281,3 +300,11 @@ window.addEventListener(
   },
   false
 );
+
+function storeValue() {
+  localStorage.setItem(currentPuzzle, cubeTimer)
+}
+
+function viewStoreValue(puzzleName) {
+
+}
