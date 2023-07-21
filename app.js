@@ -47,8 +47,8 @@ var sumOf12 = 0
 var cubeTimer;
 
 function timer() {
-  milliSec += 100;
-  cs += 10; //counts time in centiseconds
+  milliSec++;
+  cs++; //counts time in centiseconds
   msDisplay.textContent = milliSec;
 
   //once milliseconds === 100 we start increasing sec
@@ -104,17 +104,17 @@ function run() {
     running = false;
     clearInterval(interval);
 
+    createResultList()
+
     let timeElement = document.createElement("span")
     timeElement.className = "timeResult"
     timeElement.id = cubeTimer.scrambleList.length
     timeList.appendChild(timeElement)
-    timeElement.innerText = displayTime.innerText.split(" ").join("") + '&nbsp;&nbsp;&nbsp;'
+    timeElement.innerText = " " + displayTime.innerText.split(" ").join("") + " "
 
     timeElement.addEventListener("click", function (e) {
       createResultDialog(e.target.id)
     })
-
-    createResultList()
     calculateStats();
     timeList.scrollTop = timeList.scrollHeight;
     scrambleGenerator(isNewSession = false)
@@ -122,7 +122,6 @@ function run() {
 }
 
 function createResultDialog(id) {
-  // alert(DATA_RESULTS[puzzleSelect]["scramble"][[id]])
   alert(cubeTimer.scrambleList[id])
 }
 
@@ -160,7 +159,10 @@ function scrambleGenerator(isNewSession) {
       puzzleSelect = CUBE_3X3X3
   }
   currentPuzzle = puzzleSelect
-  if (isNewSession) cubeTimer = new CubeTimer(puzzleSelect)
+  if (isNewSession) cubeTimer = new CubeTimer(puzzleSelect, [], [], Infinity, -Infinity, 0, 0, 0)
+  if (localStorage) {
+    viewStoreValue(puzzleSelect)
+  }
 
 }
 
@@ -173,10 +175,12 @@ function puzzle_select() {
 }
 
 puzzle.addEventListener("change", function () {
+  storeValue()
+  clearTimes()
+  cubeTimer = new CubeTimer(puzzleSelect, [], [], Infinity, -Infinity, 0, 0, 0)
   if (localStorage) {
-    cubeTimer = localStorage.getItem(currentPuzzle)
+    viewStoreValue(puzzleSelect)
   }
-  timeList.innerText = ""
   if (puzzleSelect === CUBE_2X2X2) {
     ScrambleGenerator2x2();
     puzzleSelected.textContent = CUBE_2X2X2;
@@ -193,8 +197,6 @@ puzzle.addEventListener("change", function () {
     ScrambleGenerator5x5();
     puzzleSelected.textContent = CUBE_5X5X5;
   }
-  storeValue()
-
   currentPuzzle = puzzleSelect
 });
 
@@ -205,11 +207,11 @@ clearAll.addEventListener("click", function () {
 // clear times function
 function clearTimes() {
   cubeTimer.clearAll()
-  timeDisplay = [];
-  timeList.innerHTML = timeDisplay;
+  timeList.innerHTML = [];
   numSolvesOut.innerHTML = "Solves: " + cubeTimer.numberSolves;
   bestOut.innerHTML = "Best: ";
-  avAllOut.innerHTML = "Average: ";
+  averageOf12.innerHTML = "Ao12: ";
+  averageOf5.innerHTML = "Ao5: ";
 }
 
 //stats
@@ -228,18 +230,10 @@ function calculateStats() {
   sumOf5 += currentTime
 
   if (cubeTimer.numberSolves >= 5) {
-    // if (cubeTimer.timeList[numSolves - 6]) sumOf5 -= cubeTimer.timeList[numSolves - 6]
-    // var average = (sumOf5 - cubeTimer.bestSingle - cubeTimer.worstSingle) / 3
-    // cubeTimer.averageOf5 = Math.round(average * 100) / 100
-    // averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5)
     cubeTimer.computeAverage(5)
     averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5)
   }
   if (cubeTimer.numberSolves >= 12) {
-    // if (cubeTimer.timeList[numSolves - 13]) sumOf12 -= cubeTimer.timeList[numSolves - 13]
-    // var average = (sumOf12 - cubeTimer.bestSingle - cubeTimer.worstSingle) / 10
-    // cubeTimer.averageOf12 = Math.round(average * 100) / 100
-    // averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12)
     cubeTimer.computeAverage(12)
     averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12)
   }
@@ -288,9 +282,43 @@ window.addEventListener(
 );
 
 function storeValue() {
-  localStorage.setItem(currentPuzzle, cubeTimer)
+  localStorage.setItem(currentPuzzle, cubeTimer.toJson())
 }
 
 function viewStoreValue(puzzleName) {
+  var storeResult = localStorage.getItem(puzzleName)
+  if (storeResult) {
+    cubeTimer = fromJson(storeResult)
 
+    numSolvesOut.innerHTML = "Solves: " + cubeTimer.numberSolves;
+    if (cubeTimer.bestSingle > 0) bestOut.innerHTML = "Best: " + formatTime(cubeTimer.bestSingle)
+    if (cubeTimer.averageOf12 > 0) averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12);
+    if (cubeTimer.averageOf5 > 0) averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5);
+
+    for (let i = 0; i < cubeTimer.timeList.length; i++) {
+      let timeElement = document.createElement("span")
+      timeElement.className = "timeResult"
+      timeElement.id = i
+      timeList.appendChild(timeElement)
+      timeElement.innerText = " " + formatTime(cubeTimer.timeList[i]) + " "
+
+      timeElement.addEventListener("click", function (e) {
+        createResultDialog(e.target.id)
+      })
+    }
+  }
+}
+
+function fromJson(jData) {
+  var data = JSON.parse(jData)
+  return new CubeTimer(
+    data.cubeName,
+    data.scrambleList,
+    data.timeList,
+    data.bestSingle,
+    data.worstSingle,
+    data.averageOf5,
+    data.averageOf12,
+    data.numberSolves
+  )
 }
