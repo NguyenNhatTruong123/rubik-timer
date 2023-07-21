@@ -23,7 +23,6 @@ var savedTimes;
 var averageOf5 = document.getElementById("ao5");
 var averageOf12 = document.getElementById("ao12");
 var bestOut = document.getElementById("best");
-var numSolves = 0;
 var numSolvesOut = document.querySelector(".solveNum");
 
 // ends here
@@ -48,8 +47,8 @@ var sumOf12 = 0
 var cubeTimer;
 
 function timer() {
-  milliSec++;
-  cs++; //counts time in centiseconds
+  milliSec += 100;
+  cs += 10; //counts time in centiseconds
   msDisplay.textContent = milliSec;
 
   //once milliseconds === 100 we start increasing sec
@@ -65,7 +64,6 @@ function timer() {
       minute++;
       minColon.innerHTML = ":";
       minDisplay.innerHTML = minute;
-      displayTime.style.width = "350px";
     }
 
     //for single digit seceonds we give an additional zero
@@ -108,10 +106,9 @@ function run() {
 
     let timeElement = document.createElement("span")
     timeElement.className = "timeResult"
-    // timeElement.id = DATA_RESULTS[puzzleSelect]["scramble"].length
     timeElement.id = cubeTimer.scrambleList.length
     timeList.appendChild(timeElement)
-    timeElement.innerText = " " + displayTime.innerText.split(" ").join("") + " "
+    timeElement.innerText = displayTime.innerText.split(" ").join("") + '&nbsp;&nbsp;&nbsp;'
 
     timeElement.addEventListener("click", function (e) {
       createResultDialog(e.target.id)
@@ -125,14 +122,22 @@ function run() {
 }
 
 function createResultDialog(id) {
-  alert(DATA_RESULTS[puzzleSelect]["scramble"][[id]])
+  // alert(DATA_RESULTS[puzzleSelect]["scramble"][[id]])
+  alert(cubeTimer.scrambleList[id])
+}
+
+function convertStringToTime(timeAsString) {
+  let minutes = timeAsString.split(":");
+  var seconds = minutes[minutes.length - 1]
+
+  var minute = minutes.length == 2 ? parseFloat(minutes[0]) : 0
+
+  return minute * parseFloat(60) + parseFloat(seconds)
 }
 
 function createResultList() {
   let resultTime = displayTime.innerText.split(" ").join("")
-  // DATA_RESULTS[puzzleSelect]["timeList"].push(parseFloat(resultTime))
-  // DATA_RESULTS[puzzleSelect]["scramble"].push(currentScramble)
-  cubeTimer.timeList.push(parseFloat(resultTime))
+  cubeTimer.timeList.push(convertStringToTime(resultTime))
   cubeTimer.scrambleList.push(currentScramble)
 }
 
@@ -164,7 +169,7 @@ timeList.scrollTop = timeList.scrollHeight;
 
 //function to store the value of selected puzzle
 function puzzle_select() {
-  puzzleSelect = parseInt(puzzle.value);
+  puzzleSelect = puzzle.value;
 }
 
 puzzle.addEventListener("change", function () {
@@ -199,81 +204,62 @@ clearAll.addEventListener("click", function () {
 
 // clear times function
 function clearTimes() {
+  cubeTimer.clearAll()
   timeDisplay = [];
   timeList.innerHTML = timeDisplay;
-  numSolves = 0;
-  numSolvesOut.innerHTML = "Solves: " + numSolves;
+  numSolvesOut.innerHTML = "Solves: " + cubeTimer.numberSolves;
   bestOut.innerHTML = "Best: ";
   avAllOut.innerHTML = "Average: ";
-
-  cubeTimer.clearAll()
 }
 
 //stats
 function calculateStats() {
-  numSolves++;
-  numSolvesOut.innerHTML = "Solves: " + numSolves;
+  // numSolves++;
+  cubeTimer.numberSolves++;
+  numSolvesOut.innerHTML = "Solves: " + cubeTimer.numberSolves;
 
-  let start = numSolves - 1
-  // let currentTime = DATA_RESULTS[puzzleSelect]["timeList"][start]
-  // if (currentTime < DATA_RESULTS[puzzleSelect]["best"]) DATA_RESULTS[puzzleSelect]["best"] = currentTime
-  // if (currentTime > DATA_RESULTS[puzzleSelect]["worst"]) DATA_RESULTS[puzzleSelect]["worst"] = currentTime
+  let start = cubeTimer.numberSolves - 1
   let currentTime = cubeTimer.timeList[start]
   if (currentTime < cubeTimer.bestSingle) cubeTimer.bestSingle = currentTime
   if (currentTime > cubeTimer.worstSingle) cubeTimer.worstSingle = currentTime
-  // bestOut.innerHTML = "Best: " + DATA_RESULTS[puzzleSelect]["best"]
-  bestOut.innerHTML = "Best: " + cubeTimer.bestSingle
+  bestOut.innerHTML = "Best: " + formatTime(cubeTimer.bestSingle)
 
   sumOf12 += currentTime
   sumOf5 += currentTime
 
-  if (numSolves >= 5) {
-    // if (DATA_RESULTS[puzzleSelect]["timeList"][numSolves - 6]) sumOf5 -= DATA_RESULTS[puzzleSelect]["timeList"][numSolves - 6]
-    // var average = (sumOf5 - DATA_RESULTS[puzzleSelect]["best"] - DATA_RESULTS[puzzleSelect]["worst"]) / 3
-    // DATA_RESULTS[puzzleSelect]["averageOf5"] = Math.round(average * 100) / 100
-    // averageOf5.innerHTML = "Ao5: " + DATA_RESULTS[puzzleSelect]["averageOf5"]
-    if (cubeTimer.timeList[numSolves - 6]) sumOf5 -= cubeTimer.timeList[numSolves - 6]
-    var average = (sumOf5 - cubeTimer.bestSingle - cubeTimer.worstSingle) / 3
-    cubeTimer.averageOf5 = Math.round(average * 100) / 100
-    averageOf5.innerHTML = "Ao5: " + cubeTimer.averageOf5
+  if (cubeTimer.numberSolves >= 5) {
+    // if (cubeTimer.timeList[numSolves - 6]) sumOf5 -= cubeTimer.timeList[numSolves - 6]
+    // var average = (sumOf5 - cubeTimer.bestSingle - cubeTimer.worstSingle) / 3
+    // cubeTimer.averageOf5 = Math.round(average * 100) / 100
+    // averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5)
+    cubeTimer.computeAverage(5)
+    averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5)
   }
-  if (numSolves >= 12) {
-    // if (DATA_RESULTS[puzzleSelect]["timeList"][numSolves - 13]) sumOf5 -= DATA_RESULTS[puzzleSelect]["timeList"][numSolves - 13]
-    // var average = (sumOf5 - DATA_RESULTS[puzzleSelect]["best"] - DATA_RESULTS[puzzleSelect]["worst"]) / 10
-    // DATA_RESULTS[puzzleSelect]["averageOf12"] = Math.round(average * 100) / 100
-    // averageOf12.innerHTML = "Ao12: " + DATA_RESULTS[puzzleSelect]["averageOf12"]
-    if (cubeTimer.timeList[numSolves - 13]) sumOf12 -= cubeTimer.timeList[numSolves - 13]
-    var average = (sumOf12 - cubeTimer.bestSingle - cubeTimer.worstSingle) / 10
-    cubeTimer.averageOf12 = Math.round(average * 100) / 100
-    averageOf12.innerHTML = "Ao12: " + cubeTimer.averageOf12
+  if (cubeTimer.numberSolves >= 12) {
+    // if (cubeTimer.timeList[numSolves - 13]) sumOf12 -= cubeTimer.timeList[numSolves - 13]
+    // var average = (sumOf12 - cubeTimer.bestSingle - cubeTimer.worstSingle) / 10
+    // cubeTimer.averageOf12 = Math.round(average * 100) / 100
+    // averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12)
+    cubeTimer.computeAverage(12)
+    averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12)
   }
 
 }
 
 function formatTime(t) {
   //m = minute, s = second, c = centisecond
-  var m = 0,
-    s = 0,
-    c = 0,
-    out = "";
-  m = Math.floor(t / 6000);
-  t = t % 6000;
-  s = Math.floor(t / 100);
-  t = t % 100;
-  c = Math.floor(t);
-  if (m < 1) {
-    m = "";
+  var m = ~~(t / 60)
+  var s = Math.round((t - 60 * m) * 100) / 100
+  var out = ""
+
+  if (m >= 1) {
+    out = m.toString() + ":" + s.toString()
   } else {
-    m = m + ":";
-    if (s < 10) {
-      s = "0" + s;
-    }
-  }
-  if (c < 10) {
-    c = "0" + c;
+    out = s.toString()
   }
 
-  out = "" + m + s + "." + c;
+  if (Number.isInteger(s)) out += ".00"
+
   return out;
 }
 

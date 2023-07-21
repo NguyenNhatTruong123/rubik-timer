@@ -137,28 +137,22 @@
 }
 
 #displayTime {
-    /* width: 310px; */
-    /* height: 100px; */
+    width: auto;
     font-size: 10em;
-    margin-left: 10%;
     font-family: "Archivo Black", sans-serif;
     user-select: none;
 }
 
 .display-time-container {
-    /* width: 50vw; */
-    /* height: 20vw; */
     display: flex;
     justify-content: center;
     align-items: center;
-    /* background-color: red; */
-    margin: auto;
+    margin: 1% 20% 20% 20%;
 }
 
 .footer-container {
     width: 85%;
     margin-bottom: 1.2rem;
-    /* margin-bottom: 2rem; */
     display: flex;
     align-items: center;
     justify-content: start;
@@ -391,7 +385,6 @@ a:focus {
     .split-left #displayTime {
         font-size: 3.2em;
         text-align: center;
-        /* background-color: red; */
     }
 
     #scramble {
