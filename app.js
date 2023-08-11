@@ -159,10 +159,13 @@ function scrambleGenerator(isNewSession) {
       puzzleSelect = CUBE_3X3X3
   }
   currentPuzzle = puzzleSelect
-  if (isNewSession) cubeTimer = new CubeTimer(puzzleSelect, [], [], Infinity, -Infinity, 0, 0, 0)
-  if (localStorage) {
-    viewStoreValue(puzzleSelect)
+  if (isNewSession) {
+    cubeTimer = new CubeTimer(puzzleSelect, [], [], Infinity, -Infinity, 0, 0, 0)
+    if (localStorage) {
+      viewStoreValue(puzzleSelect)
+    }
   }
+
 
 }
 
