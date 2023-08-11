@@ -113,10 +113,11 @@ function run() {
     timeElement.innerText = " " + displayTime.innerText.split(" ").join("") + " "
 
     timeElement.addEventListener("click", function (e) {
-      createResultDialog(e.target.id)
+      createResultDialog(e.target.id - 1)
     })
     calculateStats();
     timeList.scrollTop = timeList.scrollHeight;
+    storeValue();
     scrambleGenerator(isNewSession = false)
   }
 }
@@ -165,8 +166,6 @@ function scrambleGenerator(isNewSession) {
       viewStoreValue(puzzleSelect)
     }
   }
-
-
 }
 
 // timeList.onload = view();
@@ -274,7 +273,7 @@ window.addEventListener(
   "keydown",
   function (e) {
     if (
-      ["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(
+      ["Space"].indexOf(
         e.code
       ) > -1
     ) {
