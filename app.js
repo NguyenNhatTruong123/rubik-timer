@@ -123,7 +123,30 @@ function run() {
 }
 
 function createResultDialog(id) {
-  swal("Scramble", cubeTimer.scrambleList[id])
+  swal("Scramble", cubeTimer.scrambleList[id], {
+    buttons: {
+      delete: "Delete"
+    }
+  }).then((value) => {
+    switch (value) {
+      case "delete":
+        swal({
+          title: "Confirm?",
+          text: "Are you sure to delete this result?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+          .then((willDelete) => {
+            if (willDelete) {
+              cubeTimer.deleteResult(id);
+              handleAfterDeleteResult();
+              storeValue();
+            }
+          });
+        break;
+    }
+  })
 }
 
 function convertStringToTime(timeAsString) {
@@ -228,6 +251,34 @@ function clearTimes() {
   bestOut.innerHTML = "Best: ";
   averageOf12.innerHTML = "Ao12: ";
   averageOf5.innerHTML = "Ao5: ";
+  storeValue();
+}
+
+function handleAfterDeleteResult() {
+  timeList.innerHTML = [];
+  for (let i = 0; i < cubeTimer.numberSolves; i++) {
+    let timeElement = document.createElement("span")
+    timeElement.className = "timeResult"
+    timeElement.id = i
+    timeList.appendChild(timeElement)
+    timeElement.innerText = " " + cubeTimer.timeList[i].toString() + " ";
+
+    timeElement.addEventListener("click", function () {
+      createResultDialog(i)
+    })
+  }
+
+  numSolvesOut.innerHTML = "Solves: " + cubeTimer.numberSolves;
+  bestOut.innerHTML = "Best: " + formatTime(cubeTimer.bestSingle)
+
+  if (cubeTimer.numberSolves >= 5) {
+    cubeTimer.computeAverage(5)
+    averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5)
+  }
+  if (cubeTimer.numberSolves >= 12) {
+    cubeTimer.computeAverage(12)
+    averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12)
+  }
 }
 
 //stats
@@ -238,12 +289,17 @@ function calculateStats() {
 
   let start = cubeTimer.numberSolves - 1
   let currentTime = cubeTimer.timeList[start]
-  if (currentTime < cubeTimer.bestSingle) cubeTimer.bestSingle = currentTime
+  if (currentTime < cubeTimer.bestSingle) {
+    cubeTimer.bestSingle = currentTime
+    if (cubeTimer.numberSolves > 1) {
+      swal("Congratulations", "You just set a new PB.", "success", {
+        buttons: true,
+        timer: 10000,
+      });
+    }
+  }
   if (currentTime > cubeTimer.worstSingle) cubeTimer.worstSingle = currentTime
   bestOut.innerHTML = "Best: " + formatTime(cubeTimer.bestSingle)
-
-  sumOf12 += currentTime
-  sumOf5 += currentTime
 
   if (cubeTimer.numberSolves >= 5) {
     cubeTimer.computeAverage(5)

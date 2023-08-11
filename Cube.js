@@ -20,6 +20,16 @@ class CubeTimer {
         this.numberSolves = 0
     }
 
+    deleteResult(id) {
+        let currentTime = this.timeList[id];
+        this.scrambleList.splice(id, 1);
+        this.timeList.splice(id, 1);
+        if (currentTime === this.bestSingle) {
+            this.bestSingle = Math.min.apply(null, this.timeList);
+        }
+        this.numberSolves--;
+    }
+
     computeAverage(counting) {
         var best = Infinity
         var worst = -Infinity
