@@ -123,30 +123,36 @@ function run() {
 }
 
 function createResultDialog(id) {
-  swal("Scramble", cubeTimer.scrambleList[id], {
+  swal({
+    title: cubeTimer.timeList[id],
+    text: cubeTimer.scrambleList[id],
     buttons: {
-      delete: "Delete"
-    }
-  }).then((value) => {
-    switch (value) {
-      case "delete":
-        swal({
-          title: "Confirm?",
-          text: "Are you sure to delete this result?",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-          .then((willDelete) => {
-            if (willDelete) {
-              cubeTimer.deleteResult(id);
-              handleAfterDeleteResult();
-              storeValue();
-            }
-          });
-        break;
+      delete: "Delete",
+      cancel: "Cancel"
     }
   })
+    .then((value) => {
+      switch (value) {
+        case "delete":
+          swal({
+            title: "Confirm?",
+            text: "Are you sure to delete this result?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+            .then((willDelete) => {
+              if (willDelete) {
+                cubeTimer.deleteResult(id);
+                handleAfterDeleteResult();
+                storeValue();
+              }
+            });
+          break;
+        default:
+          swal.close();
+      }
+    })
 }
 
 function convertStringToTime(timeAsString) {
