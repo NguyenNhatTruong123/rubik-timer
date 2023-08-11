@@ -72,6 +72,46 @@ function ScrambleGenerator5x5() {
   output.innerHTML = `${scramble}`;
 }
 
+// 6x6 scram
+function ScrambleGenerator6x6() {
+  let scramble = ""
+  let lastMoveIndex = -1
+  let lastPrevIndex = -1
+  var output = document.getElementById("scramble");
+  let randomIndex = 0
+
+  for (var i = 0; i < 80; i++) {
+    randomIndex = Math.floor(Math.random() * move6x6x6.length)
+    do {
+      randomIndex = Math.floor(Math.random() * move6x6x6.length)
+    } while (!checkValidNextMove(move6x6x6[randomIndex], move6x6x6[lastMoveIndex], move6x6x6[lastPrevIndex]))
+    scramble += move6x6x6[randomIndex] + " "
+    lastPrevIndex = lastMoveIndex
+    lastMoveIndex = randomIndex
+  }
+  output.innerHTML = `${scramble}`;
+}
+
+// 7x7 scram
+function ScrambleGenerator7x7() {
+  let scramble = ""
+  let lastMoveIndex = -1
+  let lastPrevIndex = -1
+  var output = document.getElementById("scramble");
+  let randomIndex = 0
+
+  for (var i = 0; i < 100; i++) {
+    randomIndex = Math.floor(Math.random() * move7x7x7.length)
+    do {
+      randomIndex = Math.floor(Math.random() * move7x7x7.length)
+    } while (!checkValidNextMove(move7x7x7[randomIndex], move7x7x7[lastMoveIndex], move7x7x7[lastPrevIndex]))
+    scramble += move7x7x7[randomIndex] + " "
+    lastPrevIndex = lastMoveIndex
+    lastMoveIndex = randomIndex
+  }
+  output.innerHTML = `${scramble}`;
+}
+
 
 // Pyraminx Scrambler
 function pyraminx() {

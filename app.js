@@ -123,7 +123,7 @@ function run() {
 }
 
 function createResultDialog(id) {
-  alert(cubeTimer.scrambleList[id])
+  swal("Scramble", cubeTimer.scrambleList[id])
 }
 
 function convertStringToTime(timeAsString) {
@@ -154,6 +154,12 @@ function scrambleGenerator(isNewSession) {
       break;
     case CUBE_5X5X5:
       ScrambleGenerator5x5();
+      break;
+    case CUBE_6X6X6:
+      ScrambleGenerator6x6();
+      break;
+    case CUBE_7X7X7:
+      ScrambleGenerator7x7();
       break;
     default:
       ScrambleGenerator3x3();
@@ -198,6 +204,14 @@ puzzle.addEventListener("change", function () {
   if (puzzleSelect === CUBE_5X5X5) {
     ScrambleGenerator5x5();
     puzzleSelected.textContent = CUBE_5X5X5;
+  }
+  if (puzzleSelect === CUBE_6X6X6) {
+    ScrambleGenerator6x6();
+    puzzleSelected.textContent = CUBE_6X6X6;
+  }
+  if (puzzleSelect === CUBE_7X7X7) {
+    ScrambleGenerator7x7();
+    puzzleSelected.textContent = CUBE_7X7X7;
   }
   currentPuzzle = puzzleSelect
 });
