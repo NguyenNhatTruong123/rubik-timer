@@ -292,6 +292,7 @@ function calculateStats() {
 
   if (cubeTimer.numberSolves === 1) {
     cubeTimer.bestSingle = currentTime
+    cubeTimer.worstSingle = currentTime
   } else {
 
     if (currentTime < cubeTimer.bestSingle) {

@@ -44,7 +44,7 @@ class CubeTimer {
             index--
         }
 
-        sum -= best - worst
+        sum = sum - best - worst
         if (counting === 5) this.averageOf5 = Math.round((sum / 3) * 100) / 100
         if (counting === 12) this.averageOf12 = Math.round((sum / 10) * 100) / 100
     }
