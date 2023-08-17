@@ -1,9 +1,18 @@
-const CUBE_2X2X2 = "2x2x2"
-const CUBE_3X3X3 = "3x3x3"
-const CUBE_4X4X4 = "4x4x4"
-const CUBE_5X5X5 = "5x5x5"
-const CUBE_6X6X6 = "6x6x6"
-const CUBE_7X7X7 = "7x7x7"
+const CUBE_2X2X2 = "222"
+const CUBE_3X3X3 = "333"
+const CUBE_4X4X4 = "444"
+const CUBE_5X5X5 = "555"
+const CUBE_6X6X6 = "666"
+const CUBE_7X7X7 = "777"
+
+const CUBE_LABEL = {
+    CUBE_2X2X2: "2x2x2",
+    CUBE_3X3X3: "3x3x3",
+    CUBE_4X4X4: "4x4x4",
+    CUBE_5X5X5: "5x5x5",
+    CUBE_6X6X6: "6x6x6",
+    CUBE_7X7X7: "7x7x7"
+}
 
 
 const move2x2x2 = ["R", "U", "F", "R'", "U'", "F'", "R2", "U2", "F2"]

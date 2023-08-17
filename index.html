@@ -19,6 +19,10 @@
     <link rel="stylesheet" href="snackbar.css" />
 
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script
+      src="https://cdn.cubing.net/js/scramble-display"
+      type="module"
+    ></script>
 
     <!-- <link rel="stylesheet" href="themeToggler.css"> -->
   </head>
@@ -44,12 +48,12 @@
             <li class="nav-item">
               <a href="#create-head-section" class="nav-link active">
                 <select name="puzzle" id="puzzle" onchange="puzzle_select()">
-                  <option value="3x3x3">3x3x3</option>
-                  <option value="2x2x2">2x2x2</option>
-                  <option value="4x4x4">4x4x4</option>
-                  <option value="5x5x5">5x5x5</option>
-                  <option value="6x6x6">6x6x6</option>
-                  <option value="7x7x7">7x7x7</option>
+                  <option value="333">3x3x3</option>
+                  <option value="222">2x2x2</option>
+                  <option value="444">4x4x4</option>
+                  <option value="555">5x5x5</option>
+                  <option value="666">6x6x6</option>
+                  <option value="777">7x7x7</option>
                 </select>
               </a>
             </li>
@@ -96,6 +100,7 @@
           </div>
         </div>
         <div id="listOfTime"></div>
+        <scramble-display id="scrambleGenerator"></scramble-display>
       </div>
     </div>
 

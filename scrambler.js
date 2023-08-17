@@ -15,6 +15,7 @@ function ScrambleGenerator2x2() {
 
   }
   output.innerHTML = `${scramble}`;
+  return scramble;
 }
 
 // 3x3 scram
@@ -27,6 +28,7 @@ function ScrambleGenerator3x3() {
     [scramble, lastMoveIndex, prevLastIndex] = randomMove(scramble, move3x3x3, 0, 17, lastMoveIndex, prevLastIndex)
   }
   output.innerHTML = `${scramble}`;
+  return scramble;
 }
 
 // 4x4 scram
@@ -50,6 +52,7 @@ function ScrambleGenerator4x4() {
     }
   }
   output.innerHTML = `${scramble}`;
+  return scramble;
 }
 
 // 5x5 scram
@@ -70,6 +73,7 @@ function ScrambleGenerator5x5() {
     lastMoveIndex = randomIndex
   }
   output.innerHTML = `${scramble}`;
+  return scramble;
 }
 
 // 6x6 scram
@@ -90,6 +94,7 @@ function ScrambleGenerator6x6() {
     lastMoveIndex = randomIndex
   }
   output.innerHTML = `${scramble}`;
+  return scramble;
 }
 
 // 7x7 scram
@@ -110,6 +115,7 @@ function ScrambleGenerator7x7() {
     lastMoveIndex = randomIndex
   }
   output.innerHTML = `${scramble}`;
+  return scramble;
 }
 
 
