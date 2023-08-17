@@ -40,7 +40,12 @@ var second = 0;
 var minute = 0;
 var cs = 0;
 
+// interval for timer
 let interval;
+
+// interval for hold space to start
+var spaceInterval
+var called = false;
 
 var currentScramble = ""
 
@@ -135,8 +140,8 @@ function createResultDialog(id) {
       switch (value) {
         case "delete":
           swal({
-            title: "Confirm?",
-            text: "Are you sure to delete this result?",
+            title: "Sure chưa?",
+            text: "Muốn xóa của nợ này khỏi danh sách đã solve không?",
             icon: "warning",
             buttons: true,
             dangerMode: true,
@@ -241,7 +246,33 @@ puzzle.addEventListener("change", function () {
 });
 
 clearAll.addEventListener("click", function () {
-  clearTimes()
+  if (cubeTimer.numberSolves > 0) {
+    swal({
+      title: "Chắc chưa ????",
+      text: "Are you chắc là xóa hết toàn bộ chưa? Cho suy nghĩ lại đó.",
+      buttons: {
+        delete: "Xóa là xóa",
+        cancel: "Thì không xóa"
+      }
+    })
+      .then((value) => {
+        switch (value) {
+          case "delete":
+            swal({
+              text: "Ok, vậy là bạn đã chọn giải lại tới chết. Chọn OK là xóa hết.",
+              dangerMode: true,
+            })
+              .then((willDelete) => {
+                if (willDelete) {
+                  clearTimes()
+                }
+              });
+            break;
+          default:
+            swal.close();
+        }
+      })
+  }
 });
 
 // clear times function
@@ -337,26 +368,10 @@ function formatTime(t) {
 }
 
 // window.onkeyup = run;
-document.addEventListener("keypress", (e) => {
+document.addEventListener("keydown", (e) => {
   if (e.code === "Space") {
     currentScramble = scramble.innerText
     run();
-  } else {
-    if (e.key == 123) {
-      e.preventDefault();
-    }
-    if (e.ctrlKey && e.shiftKey && e.key == 'I') {
-      e.preventDefault();
-    }
-    if (e.ctrlKey && e.shiftKey && e.key == 'C') {
-      e.preventDefault();
-    }
-    if (e.ctrlKey && e.shiftKey && e.key == 'J') {
-      e.preventDefault();
-    }
-    if (e.ctrlKey && e.key == 'U') {
-      e.preventDefault();
-    }
   }
 });
 
