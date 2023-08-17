@@ -43,3 +43,5 @@ function randomMove(scramble, moves, startIndex, endIndex, lastMoveIndex, prevLa
 //     }
 //     return false
 // }
+
+export { checkValidNextMove, randomMove }

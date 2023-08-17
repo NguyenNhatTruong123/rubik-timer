@@ -1,25 +1,27 @@
+const CubeTimer = require('./Cube')
+import { ScrambleGenerator2x2, ScrambleGenerator3x3, ScrambleGenerator4x4, ScrambleGenerator5x5, ScrambleGenerator6x6, ScrambleGenerator7x7 } from "./scrambler"
+import { CUBE_2X2X2, CUBE_3X3X3, CUBE_4X4X4, CUBE_5X5X5, CUBE_6X6X6, CUBE_7X7X7, CUBE_LABEL, move2x2x2, move3x3x3, move4x4x4, move5x5x5, move6x6x6, move7x7x7 } from "./constant"
+
 var msDisplay = document.querySelector("#milliSec");
 var secDisplay = document.querySelector("#second");
 var minDisplay = document.querySelector("#minute");
 var minColon = document.querySelector("#minColon");
-var displayTimeContainer = document.querySelector('.display-time-container');
-var displayTime = document.querySelector("#displayTime");
-var displayReset = document.querySelector("#displayReset");
+// var displayTimeContainer = document.querySelector('.display-time-container');
+// var displayTime = document.querySelector("#displayTime");
+// var displayReset = document.querySelector("#displayReset");
 var timeList = document.querySelector("#listOfTime");
-var puzzleSelected = document.querySelector("#puzzleSelected");
+var eventSelected = document.querySelector("#eventSelected");
 var puzzle = document.querySelector("#puzzle");
 var scramble = document.querySelector("#scramble");
-var newScramGenerate = document.querySelector("#newScramGenerate");
+// var newScramGenerate = document.querySelector("#newScramGenerate");
 var clearAll = document.querySelector("#clear");
-var showHtl = document.querySelector(".showHtl");
-var showTimes = document.querySelector("#showTimes");
-var splitRight = document.querySelector(".split-right");
-var splitLeft = document.querySelector(".split-left");
+// var showHtl = document.querySelector(".showHtl");
+// var showTimes = document.querySelector("#showTimes");
+// var splitRight = document.querySelector(".split-right");
+// var splitLeft = document.querySelector(".split-left");
 var scrambleGeneratorEl = document.getElementById("scrambleGenerator")
 
-var puzzleSelect;
-var currentPuzzle;
-var savedTimes;
+var puzzleSelected;
 // new variables stats
 var averageOf5 = document.getElementById("ao5");
 var averageOf12 = document.getElementById("ao12");
@@ -30,9 +32,7 @@ var currentScramble = ""
 
 // ends here
 
-var timeDisplay = [];
-
-scrambleGenerator(isNewSession = true)
+scrambleGenerator(true)
 
 var running = false;
 var milliSec = 0;
@@ -43,9 +43,6 @@ var cs = 0;
 let interval;
 
 var currentScramble = ""
-
-var sumOf5 = 0
-var sumOf12 = 0
 
 var cubeTimer;
 
@@ -121,7 +118,7 @@ function run() {
     calculateStats();
     timeList.scrollTop = timeList.scrollHeight;
     storeValue();
-    scrambleGenerator(isNewSession = false)
+    scrambleGenerator(false)
   }
 }
 
@@ -174,7 +171,7 @@ function createResultList() {
 }
 
 function scrambleGenerator(isNewSession) {
-  switch (puzzleSelect) {
+  switch (puzzleSelected) {
     case CUBE_2X2X2:
       currentScramble = ScrambleGenerator2x2();
       break;
@@ -195,60 +192,51 @@ function scrambleGenerator(isNewSession) {
       break;
     default:
       currentScramble = ScrambleGenerator3x3();
-      puzzleSelect = CUBE_3X3X3
+      puzzleSelected = CUBE_3X3X3
   }
-  currentPuzzle = puzzleSelect
   drawScramble(currentScramble)
   if (isNewSession) {
-    cubeTimer = new CubeTimer(puzzleSelect, [], [], Infinity, -Infinity, 0, 0, 0)
+    cubeTimer = new CubeTimer(puzzleSelected, [], [], 10000000, 0, 0, 0, 0)
     if (localStorage) {
-      viewStoreValue(puzzleSelect)
+      viewStoreValue(puzzleSelected)
     }
   }
 }
 
 function drawScramble(scram) {
-  // scrambleGeneratorEl.removeAttribute()
-  scrambleGeneratorEl.setAttribute("event", currentPuzzle)
+  scrambleGeneratorEl.setAttribute("event", puzzleSelected)
   scrambleGeneratorEl.setAttribute("scramble", scram)
-  scrambleGeneratorEl.setAttribute("visualization", "3D")
+  scrambleGeneratorEl.setAttribute("visualization", "2D")
 }
 
-// timeList.onload = view();
 timeList.scrollTop = timeList.scrollHeight;
 
-//function to store the value of selected puzzle
-function puzzle_select() {
-  puzzleSelect = puzzle.value;
-}
-
 puzzle.addEventListener("change", function () {
-  storeValue()
+  puzzleSelected = puzzle.value;
   clearTimes()
-  cubeTimer = new CubeTimer(puzzleSelect, [], [], Infinity, -Infinity, 0, 0, 0)
+  cubeTimer = new CubeTimer(puzzleSelected, [], [], Infinity, -Infinity, 0, 0, 0)
   if (localStorage) {
-    viewStoreValue(puzzleSelect)
+    viewStoreValue(puzzleSelected)
   }
-  if (puzzleSelect === CUBE_2X2X2) {
+  if (puzzleSelected === CUBE_2X2X2) {
     currentScramble = ScrambleGenerator2x2();
   }
-  if (puzzleSelect === CUBE_3X3X3) {
+  if (puzzleSelected === CUBE_3X3X3) {
     currentScramble = ScrambleGenerator3x3();
   }
-  if (puzzleSelect === CUBE_4X4X4) {
+  if (puzzleSelected === CUBE_4X4X4) {
     currentScramble = ScrambleGenerator4x4();
   }
-  if (puzzleSelect === CUBE_5X5X5) {
+  if (puzzleSelected === CUBE_5X5X5) {
     currentScramble = ScrambleGenerator5x5();
   }
-  if (puzzleSelect === CUBE_6X6X6) {
+  if (puzzleSelected === CUBE_6X6X6) {
     currentScramble = ScrambleGenerator6x6();
   }
-  if (puzzleSelect === CUBE_7X7X7) {
+  if (puzzleSelected === CUBE_7X7X7) {
     currentScramble = ScrambleGenerator7x7();
   }
-  currentPuzzle = puzzleSelect
-  puzzleSelected.textContent = CUBE_LABEL[puzzleSelect]
+  eventSelected.textContent = CUBE_LABEL[puzzleSelected]
   drawScramble(currentScramble)
 });
 
@@ -296,19 +284,24 @@ function handleAfterDeleteResult() {
 
 //stats
 function calculateStats() {
-  // numSolves++;
   cubeTimer.numberSolves++;
   numSolvesOut.innerHTML = "Solves: " + cubeTimer.numberSolves;
 
   let start = cubeTimer.numberSolves - 1
   let currentTime = cubeTimer.timeList[start]
-  if (currentTime < cubeTimer.bestSingle) {
+
+  if (cubeTimer.numberSolves === 1) {
     cubeTimer.bestSingle = currentTime
-    if (cubeTimer.numberSolves > 1) {
-      swal("Congratulations", "You just set a new PB.", "success", {
-        buttons: true,
-        timer: 10000,
-      });
+  } else {
+
+    if (currentTime < cubeTimer.bestSingle) {
+      cubeTimer.bestSingle = currentTime
+      if (cubeTimer.numberSolves > 1) {
+        swal("Congratulations", "You just set a new PB.", "success", {
+          buttons: true,
+          timer: 10000,
+        });
+      }
     }
   }
   if (currentTime > cubeTimer.worstSingle) cubeTimer.worstSingle = currentTime
@@ -343,31 +336,45 @@ function formatTime(t) {
 }
 
 // window.onkeyup = run;
-window.addEventListener("keyup", (e) => {
-  if (e.keyCode === 32) {
+document.addEventListener("keypress", (e) => {
+  if (e.code === "Space") {
     currentScramble = scramble.innerText
     run();
+  } else {
+    if (e.key == 123) {
+      e.preventDefault();
+    }
+    if (e.ctrlKey && e.shiftKey && e.key == 'I') {
+      e.preventDefault();
+    }
+    if (e.ctrlKey && e.shiftKey && e.key == 'C') {
+      e.preventDefault();
+    }
+    if (e.ctrlKey && e.shiftKey && e.key == 'J') {
+      e.preventDefault();
+    }
+    if (e.ctrlKey && e.key == 'U') {
+      e.preventDefault();
+    }
   }
 });
 
-
-
-window.addEventListener(
-  "keydown",
-  function (e) {
-    if (
-      ["Space"].indexOf(
-        e.code
-      ) > -1
-    ) {
-      e.preventDefault();
-    }
-  },
-  false
-);
+// window.addEventListener(
+//   "keydown",
+//   function (e) {
+//     if (
+//       ["Space"].indexOf(
+//         e.code
+//       ) > -1
+//     ) {
+//       e.preventDefault();
+//     }
+//   },
+//   false
+// );
 
 function storeValue() {
-  localStorage.setItem(currentPuzzle, cubeTimer.toJson())
+  localStorage.setItem(puzzleSelected, cubeTimer.toJson())
 }
 
 function viewStoreValue(puzzleName) {
@@ -407,3 +414,4 @@ function fromJson(jData) {
     data.numberSolves
   )
 }
+
