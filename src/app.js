@@ -140,8 +140,8 @@ function createResultDialog(id) {
       switch (value) {
         case "delete":
           swal({
-            title: "Sure chưa?",
-            text: "Muốn xóa của nợ này khỏi danh sách đã solve không?",
+            title: "Confirm ?",
+            text: "Are you sure to delete this result ?",
             icon: "warning",
             buttons: true,
             dangerMode: true,
@@ -248,25 +248,19 @@ puzzle.addEventListener("change", function () {
 clearAll.addEventListener("click", function () {
   if (cubeTimer.numberSolves > 0) {
     swal({
-      title: "Chắc chưa ????",
-      text: "Are you chắc là xóa hết toàn bộ chưa? Cho suy nghĩ lại đó.",
+      title: "Confirm ?",
+      text: "Are you sure to clear all your " + CUBE_LABEL[puzzleSelected] + " result ?",
       buttons: {
-        delete: "Xóa là xóa",
-        cancel: "Thì không xóa"
-      }
+        delete: "Delete",
+        cancel: "Cancel"
+      },
+      icon: "warning",
+      dangerMode: true
     })
       .then((value) => {
         switch (value) {
           case "delete":
-            swal({
-              text: "Ok, vậy là bạn đã chọn giải lại tới chết. Chọn OK là xóa hết.",
-              dangerMode: true,
-            })
-              .then((willDelete) => {
-                if (willDelete) {
-                  clearTimes()
-                }
-              });
+            clearTimes()
             break;
           default:
             swal.close();
