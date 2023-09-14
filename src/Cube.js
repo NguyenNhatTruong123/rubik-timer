@@ -63,4 +63,4 @@ class CubeTimer {
     }
 }
 
-module.exports = CubeTimer
+export default CubeTimer

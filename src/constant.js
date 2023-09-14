@@ -30,4 +30,4 @@ const move7x7x7 = ["R", "L", "U", "D", "F", "B", "R'", "L'", "U'", "D'", "F'", "
     "Rw", "Lw", "Uw", "Dw", "Fw", "Bw", "Rw'", "Lw'", "Uw'", "Dw'", "Fw'", "Bw'", "Rw2", "Lw2", "Uw2", "Dw2", "Fw2", "Bw2",
     "3Rw", "3Lw", "3Uw", "3Dw", "3Fw", "3Bw", "3Rw'", "3Lw'", "3Uw'", "3Dw'", "3Fw'", "3Bw'", "3Rw2", "3Lw2", "3Uw2", "3Dw2", "3Fw2", "3Bw2"]
 
-export { CUBE_2X2X2, CUBE_3X3X3, CUBE_4X4X4, CUBE_5X5X5, CUBE_6X6X6, CUBE_7X7X7, CUBE_LABEL, move2x2x2, move3x3x3, move4x4x4, move5x5x5, move6x6x6, move7x7x7 }
+export default { CUBE_2X2X2, CUBE_3X3X3, CUBE_4X4X4, CUBE_5X5X5, CUBE_6X6X6, CUBE_7X7X7, CUBE_LABEL, move2x2x2, move3x3x3, move4x4x4, move5x5x5, move6x6x6, move7x7x7 }
