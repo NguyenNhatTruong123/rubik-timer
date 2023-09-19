@@ -4,7 +4,7 @@ I modified a little bit like:
 1. Add event 6x6 and 7x7
 2. Change scramble generator algorithm.
 3. Delete solve one by one
-4. Drawing scramble (thanks to repo https://github.com/cubing/scramble-display.git)
+4. Drawing scramble (thanks to repo https://github.com/cubing/scramble-display.git) 
 5. Congratulations when you got a new Personal Best.
 6. Confirmation when delete all your result.
 

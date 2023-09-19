@@ -1,4 +1,4 @@
-const CubeTimer = require('./Cube')
+const CubeTimer = require('./Cube').default
 import { ScrambleGenerator2x2, ScrambleGenerator3x3, ScrambleGenerator4x4, ScrambleGenerator5x5, ScrambleGenerator6x6, ScrambleGenerator7x7 } from "./scrambler"
 import { CUBE_2X2X2, CUBE_3X3X3, CUBE_4X4X4, CUBE_5X5X5, CUBE_6X6X6, CUBE_7X7X7, CUBE_LABEL, move2x2x2, move3x3x3, move4x4x4, move5x5x5, move6x6x6, move7x7x7 } from "./constant"
 
@@ -6,19 +6,11 @@ var msDisplay = document.querySelector("#milliSec");
 var secDisplay = document.querySelector("#second");
 var minDisplay = document.querySelector("#minute");
 var minColon = document.querySelector("#minColon");
-// var displayTimeContainer = document.querySelector('.display-time-container');
-// var displayTime = document.querySelector("#displayTime");
-// var displayReset = document.querySelector("#displayReset");
 var timeList = document.querySelector("#listOfTime");
 var eventSelected = document.querySelector("#eventSelected");
 var puzzle = document.querySelector("#puzzle");
 var scramble = document.querySelector("#scramble");
-// var newScramGenerate = document.querySelector("#newScramGenerate");
 var clearAll = document.querySelector("#clear");
-// var showHtl = document.querySelector(".showHtl");
-// var showTimes = document.querySelector("#showTimes");
-// var splitRight = document.querySelector(".split-right");
-// var splitLeft = document.querySelector(".split-left");
 var scrambleGeneratorEl = document.getElementById("scrambleGenerator")
 
 var puzzleSelected;
@@ -42,10 +34,6 @@ var cs = 0;
 
 // interval for timer
 let interval;
-
-// interval for hold space to start
-var spaceInterval
-var called = false;
 
 var currentScramble = ""
 
@@ -128,12 +116,15 @@ function run() {
 }
 
 function createResultDialog(id) {
+  var thisTime = cubeTimer.timeList[id]
   swal({
-    title: cubeTimer.timeList[id],
+    title: thisTime,
     text: cubeTimer.scrambleList[id],
     buttons: {
       delete: "Delete",
-      cancel: "Cancel"
+      cancel: "Cancel",
+      plusTwo: "+2",
+      dnf: "Make this DNF"
     }
   })
     .then((value) => {
@@ -154,6 +145,12 @@ function createResultDialog(id) {
               }
             });
           break;
+        case "plusTwo":
+          cubeTimer.timeList[id] += 2;
+          handleAfterDeleteResult();
+          storeValue()
+          break;
+
         default:
           swal.close();
       }
@@ -281,18 +278,20 @@ function clearTimes() {
 }
 
 function handleAfterDeleteResult() {
-  timeList.innerHTML = [];
-  for (let i = 0; i < cubeTimer.numberSolves; i++) {
-    let timeElement = document.createElement("span")
-    timeElement.className = "timeResult"
-    timeElement.id = i
-    timeList.appendChild(timeElement)
-    timeElement.innerText = " " + cubeTimer.timeList[i].toString() + " ";
+  // timeList.innerHTML = [];
+  // for (let i = 0; i < cubeTimer.numberSolves; i++) {
+  //   let timeElement = document.createElement("span")
+  //   timeElement.className = "timeResult"
+  //   timeElement.id = i
+  //   timeList.appendChild(timeElement)
+  //   timeElement.innerText = " " + cubeTimer.timeList[i].toString() + " ";
 
-    timeElement.addEventListener("click", function () {
-      createResultDialog(i)
-    })
-  }
+  //   timeElement.addEventListener("click", function () {
+  //     createResultDialog(i)
+  //   })
+  // }
+
+  document.querySelector(".timeResult #" + id).remove()
 
   numSolvesOut.innerHTML = "Solves: " + cubeTimer.numberSolves;
   bestOut.innerHTML = "Best: " + formatTime(cubeTimer.bestSingle)
@@ -305,6 +304,10 @@ function handleAfterDeleteResult() {
     cubeTimer.computeAverage(12)
     averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12)
   }
+}
+
+function handleAfterPlusTwo(id) {
+
 }
 
 //stats
@@ -368,20 +371,6 @@ document.addEventListener("keydown", (e) => {
     run();
   }
 });
-
-// window.addEventListener(
-//   "keydown",
-//   function (e) {
-//     if (
-//       ["Space"].indexOf(
-//         e.code
-//       ) > -1
-//     ) {
-//       e.preventDefault();
-//     }
-//   },
-//   false
-// );
 
 function storeValue() {
   localStorage.setItem(puzzleSelected, cubeTimer.toJson())
