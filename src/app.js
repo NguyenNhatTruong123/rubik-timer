@@ -1,6 +1,6 @@
-const CubeTimer = require('./Cube').default
-import { ScrambleGenerator2x2, ScrambleGenerator3x3, ScrambleGenerator4x4, ScrambleGenerator5x5, ScrambleGenerator6x6, ScrambleGenerator7x7 } from "./scrambler"
-import { CUBE_2X2X2, CUBE_3X3X3, CUBE_4X4X4, CUBE_5X5X5, CUBE_6X6X6, CUBE_7X7X7, CUBE_LABEL, move2x2x2, move3x3x3, move4x4x4, move5x5x5, move6x6x6, move7x7x7 } from "./constant"
+// const CubeTimer = require('./Cube')
+// import { ScrambleGenerator2x2, ScrambleGenerator3x3, ScrambleGenerator4x4, ScrambleGenerator5x5, ScrambleGenerator6x6, ScrambleGenerator7x7 } from "./scrambler"
+// import { CUBE_2X2X2, CUBE_3X3X3, CUBE_4X4X4, CUBE_5X5X5, CUBE_6X6X6, CUBE_7X7X7, CUBE_LABEL, move2x2x2, move3x3x3, move4x4x4, move5x5x5, move6x6x6, move7x7x7 } from "./constant"
 
 var msDisplay = document.querySelector("#milliSec");
 var secDisplay = document.querySelector("#second");
@@ -140,7 +140,7 @@ function createResultDialog(id) {
             .then((willDelete) => {
               if (willDelete) {
                 cubeTimer.deleteResult(id);
-                handleAfterDeleteResult();
+                handleAfterDeleteResult(id);
                 storeValue();
               }
             });
@@ -277,7 +277,7 @@ function clearTimes() {
   storeValue();
 }
 
-function handleAfterDeleteResult() {
+function handleAfterDeleteResult(id) {
   // timeList.innerHTML = [];
   // for (let i = 0; i < cubeTimer.numberSolves; i++) {
   //   let timeElement = document.createElement("span")
@@ -291,7 +291,8 @@ function handleAfterDeleteResult() {
   //   })
   // }
 
-  document.querySelector(".timeResult #" + id).remove()
+  let spanTimeList = document.querySelectorAll(".timeResult")
+  timeList.removeChild(spanTimeList[id])
 
   numSolvesOut.innerHTML = "Solves: " + cubeTimer.numberSolves;
   bestOut.innerHTML = "Best: " + formatTime(cubeTimer.bestSingle)

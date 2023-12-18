@@ -63,4 +63,4 @@ class CubeTimer {
     }
 }
 
-module.exports = CubeTimer
+// module.exports = CubeTimer
