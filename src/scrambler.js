@@ -120,5 +120,3 @@ function ScrambleGenerator7x7() {
   output.innerHTML = `${scramble}`;
   return scramble;
 }
-
-// export { ScrambleGenerator2x2, ScrambleGenerator3x3, ScrambleGenerator4x4, ScrambleGenerator5x5, ScrambleGenerator6x6, ScrambleGenerator7x7 }

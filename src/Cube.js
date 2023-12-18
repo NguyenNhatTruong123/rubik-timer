@@ -62,5 +62,3 @@ class CubeTimer {
         });
     }
 }
-
-// module.exports = CubeTimer

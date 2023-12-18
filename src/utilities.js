@@ -31,17 +31,3 @@ function randomMove(scramble, moves, startIndex, endIndex, lastMoveIndex, prevLa
 
     return [scramble, lastMoveIndex, prevLastIndex]
 }
-
-// Check valid next move for 5x5 or bigger
-// function checkValidBigCubeNextMove(currentMove, lastMove, prevLastMove) {
-//     if (!currentMove || !lastMove || !prevLastMove) return true
-//     else {
-//         if (currentMove[1] === lastMove[1] && currentMove[1] === prevLastMove[1]) checkValidNextMove(currentMove, lastMove, prevLastMove)
-//         else {
-//             if (currentMove !== lastMove) return true
-//         }
-//     }
-//     return false
-// }
-
-// export { checkValidNextMove, randomMove }
