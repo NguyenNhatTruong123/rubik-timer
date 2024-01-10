@@ -101,7 +101,8 @@ function run() {
 
     let timeElement = document.createElement("span")
     timeElement.className = "timeResult"
-    timeElement.id = cubeTimer.scrambleList.length
+    // timeElement.id = cubeTimer.scrambleList.length
+    timeElement.id = cubeTimer.timeList.length
     timeList.appendChild(timeElement)
     timeElement.innerText = " " + displayTime.innerText.split(" ").join("") + " "
 
@@ -116,15 +117,15 @@ function run() {
 }
 
 function createResultDialog(id) {
-  var thisTime = cubeTimer.timeList[id]
+  var thisTime = cubeTimer.timeList[id].time
   swal({
     title: thisTime,
-    text: cubeTimer.scrambleList[id],
+    text: cubeTimer.timeList[id].scramble,
     buttons: {
       delete: "Delete",
-      cancel: "Cancel",
       plusTwo: "+2",
-      dnf: "Make this DNF"
+      dnf: "Make this DNF",
+      cancel: "Cancel"
     }
   })
     .then((value) => {
@@ -168,8 +169,8 @@ function convertStringToTime(timeAsString) {
 
 function createResultList() {
   let resultTime = displayTime.innerText.split(" ").join("")
-  cubeTimer.timeList.push(convertStringToTime(resultTime))
-  cubeTimer.scrambleList.push(currentScramble)
+  let solveInfo = new Solve(convertStringToTime(resultTime), currentScramble, false, false)
+  cubeTimer.timeList.push(solveInfo)
 }
 
 function scrambleGenerator(isNewSession) {
@@ -198,7 +199,7 @@ function scrambleGenerator(isNewSession) {
   }
   drawScramble(currentScramble)
   if (isNewSession) {
-    cubeTimer = new CubeTimer(puzzleSelected, [], [], 10000000, 0, 0, 0, 0)
+    cubeTimer = new CubeTimer(puzzleSelected, [], 10000000, 0, 0, 0)
     if (localStorage) {
       viewStoreValue(puzzleSelected)
     }
@@ -220,30 +221,33 @@ puzzle.addEventListener("change", function () {
   if (localStorage) {
     viewStoreValue(puzzleSelected)
   }
-  if (puzzleSelected === CUBE_2X2X2) {
-    currentScramble = ScrambleGenerator2x2();
+  switch (puzzleSelected) {
+    case CUBE_2X2X2:
+      currentScramble = ScrambleGenerator2x2()
+      break;
+    case CUBE_3X3X3:
+      currentScramble = ScrambleGenerator3x3()
+      break;
+    case CUBE_4X4X4:
+      currentScramble = ScrambleGenerator4x4()
+      break;
+    case CUBE_5X5X5:
+      currentScramble = ScrambleGenerator5x5()
+      break;
+    case CUBE_6X6X6:
+      currentScramble = ScrambleGenerator6x6()
+      break;
+    case CUBE_7X7X7:
+      currentScramble = ScrambleGenerator7x7()
+      break;
   }
-  if (puzzleSelected === CUBE_3X3X3) {
-    currentScramble = ScrambleGenerator3x3();
-  }
-  if (puzzleSelected === CUBE_4X4X4) {
-    currentScramble = ScrambleGenerator4x4();
-  }
-  if (puzzleSelected === CUBE_5X5X5) {
-    currentScramble = ScrambleGenerator5x5();
-  }
-  if (puzzleSelected === CUBE_6X6X6) {
-    currentScramble = ScrambleGenerator6x6();
-  }
-  if (puzzleSelected === CUBE_7X7X7) {
-    currentScramble = ScrambleGenerator7x7();
-  }
+
   eventSelected.textContent = CUBE_LABEL[puzzleSelected]
   drawScramble(currentScramble)
 });
 
 clearAll.addEventListener("click", function () {
-  if (cubeTimer.numberSolves > 0) {
+  if (cubeTimer.timeList.length > 0) {
     swal({
       title: "Confirm ?",
       text: "Are you sure to clear all your " + CUBE_LABEL[puzzleSelected] + " result ?",
@@ -270,7 +274,7 @@ clearAll.addEventListener("click", function () {
 function clearTimes() {
   cubeTimer.clearAll()
   timeList.innerHTML = [];
-  numSolvesOut.innerHTML = "Solves: " + cubeTimer.numberSolves;
+  numSolvesOut.innerHTML = "Solves: ";
   bestOut.innerHTML = "Best: ";
   averageOf12.innerHTML = "Ao12: ";
   averageOf5.innerHTML = "Ao5: ";
@@ -278,30 +282,20 @@ function clearTimes() {
 }
 
 function handleAfterDeleteResult(id) {
-  // timeList.innerHTML = [];
-  // for (let i = 0; i < cubeTimer.numberSolves; i++) {
-  //   let timeElement = document.createElement("span")
-  //   timeElement.className = "timeResult"
-  //   timeElement.id = i
-  //   timeList.appendChild(timeElement)
-  //   timeElement.innerText = " " + cubeTimer.timeList[i].toString() + " ";
 
-  //   timeElement.addEventListener("click", function () {
-  //     createResultDialog(i)
-  //   })
-  // }
+  let numSolves = cubeTimer.timeList.length
 
   let spanTimeList = document.querySelectorAll(".timeResult")
   timeList.removeChild(spanTimeList[id])
 
-  numSolvesOut.innerHTML = "Solves: " + cubeTimer.numberSolves;
+  numSolvesOut.innerHTML = "Solves: " + numSolves;
   bestOut.innerHTML = "Best: " + formatTime(cubeTimer.bestSingle)
 
-  if (cubeTimer.numberSolves >= 5) {
+  if (numSolves >= 5) {
     cubeTimer.computeAverage(5)
     averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5)
   }
-  if (cubeTimer.numberSolves >= 12) {
+  if (numSolves >= 12) {
     cubeTimer.computeAverage(12)
     averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12)
   }
@@ -313,20 +307,19 @@ function handleAfterPlusTwo(id) {
 
 //stats
 function calculateStats() {
-  cubeTimer.numberSolves++;
-  numSolvesOut.innerHTML = "Solves: " + cubeTimer.numberSolves;
+  let numSolves = cubeTimer.timeList.length
+  numSolvesOut.innerHTML = "Solves: " + numSolves;
 
-  let start = cubeTimer.numberSolves - 1
-  let currentTime = cubeTimer.timeList[start]
+  let start = numSolves - 1
+  let currentTime = cubeTimer.timeList[start].time
 
-  if (cubeTimer.numberSolves === 1) {
+  if (numSolves === 1) {
     cubeTimer.bestSingle = currentTime
     cubeTimer.worstSingle = currentTime
   } else {
-
     if (currentTime < cubeTimer.bestSingle) {
       cubeTimer.bestSingle = currentTime
-      if (cubeTimer.numberSolves > 1) {
+      if (numSolves > 1) {
         swal("Congratulations", "You just set a new PB.", "success", {
           buttons: true,
           timer: 10000,
@@ -337,11 +330,11 @@ function calculateStats() {
   if (currentTime > cubeTimer.worstSingle) cubeTimer.worstSingle = currentTime
   bestOut.innerHTML = "Best: " + formatTime(cubeTimer.bestSingle)
 
-  if (cubeTimer.numberSolves >= 5) {
+  if (numSolves >= 5) {
     cubeTimer.computeAverage(5)
     averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5)
   }
-  if (cubeTimer.numberSolves >= 12) {
+  if (numSolves >= 12) {
     cubeTimer.computeAverage(12)
     averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12)
   }
@@ -382,7 +375,7 @@ function viewStoreValue(puzzleName) {
   if (storeResult) {
     cubeTimer = fromJson(storeResult)
 
-    numSolvesOut.innerHTML = "Solves: " + cubeTimer.numberSolves;
+    numSolvesOut.innerHTML = "Solves: " + cubeTimer.timeList.length;
     if (cubeTimer.bestSingle > 0) bestOut.innerHTML = "Best: " + formatTime(cubeTimer.bestSingle)
     if (cubeTimer.averageOf12 > 0) averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12);
     if (cubeTimer.averageOf5 > 0) averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5);
@@ -405,13 +398,11 @@ function fromJson(jData) {
   var data = JSON.parse(jData)
   return new CubeTimer(
     data.cubeName,
-    data.scrambleList,
     data.timeList,
     data.bestSingle,
     data.worstSingle,
     data.averageOf5,
     data.averageOf12,
-    data.numberSolves
   )
 }
 

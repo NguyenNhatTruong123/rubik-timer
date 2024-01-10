@@ -1,33 +1,27 @@
 class CubeTimer {
-    constructor(cubeName, scrambleList, timeList, bestSingle, worstSingle, averageOf5, averageOf12, numberSolves) {
+    constructor(cubeName, timeList, bestSingle, worstSingle, averageOf5, averageOf12) {
         this.cubeName = cubeName
-        this.scrambleList = scrambleList
         this.timeList = timeList
         this.bestSingle = bestSingle
         this.worstSingle = worstSingle
         this.averageOf5 = averageOf5
         this.averageOf12 = averageOf12
-        this.numberSolves = numberSolves
     }
 
     clearAll() {
-        this.scrambleList = []
         this.timeList = []
         this.bestSingle = Infinity
         this.worstSingle = -Infinity
         this.averageOf5 = 0
         this.averageOf12 = 0
-        this.numberSolves = 0
     }
 
     deleteResult(id) {
-        let currentTime = this.timeList[id];
-        this.scrambleList.splice(id, 1);
+        let currentTime = this.timeList[id].time;
         this.timeList.splice(id, 1);
         if (currentTime === this.bestSingle) {
             this.bestSingle = Math.min.apply(null, this.timeList);
         }
-        this.numberSolves--;
     }
 
     computeAverage(counting) {
@@ -35,9 +29,9 @@ class CubeTimer {
         var worst = -Infinity
 
         var sum = 0
-        var index = this.numberSolves - 1
+        var index = this.timeList.length - 1
         for (let i = 1; i <= counting; i++) {
-            let time = this.timeList[index]
+            let time = this.timeList[index].time
             if (time < best) best = time
             if (time > worst) worst = time
             sum += time
@@ -52,13 +46,11 @@ class CubeTimer {
     toJson() {
         return JSON.stringify({
             cubeName: this.cubeName,
-            scrambleList: this.scrambleList,
             timeList: this.timeList,
             bestSingle: this.bestSingle,
             worstSingle: this.worstSingle,
             averageOf5: this.averageOf5,
             averageOf12: this.averageOf12,
-            numberSolves: this.numberSolves
         });
     }
 }

@@ -60,8 +60,6 @@
       </div>
     </nav>
 
-    <!-- body -->
-
     <div class="main-container">
       <div class="split split-left">
         <div class="dialog dialogcfm"></div>
@@ -79,15 +77,6 @@
             ><span id="milliSec">00</span>
           </div>
         </div>
-        <scramble-display id="scrambleGenerator"></scramble-display>
-      </div>
-
-      <div class="split split-right">
-        <div class="heading">
-          <a href="#" id="heading">Solves</a>
-        </div>
-        <div><button id="clear">Clear Times</button></div>
-        <div id="eventSelected">3x3x3</div>
         <div id="stats">
           <div class="stats-content">
             <span class="solveNum">Solves: 0</span> <br />
@@ -96,11 +85,22 @@
             <span id="best">Best: </span>
           </div>
         </div>
+      </div>
+
+      <div class="split split-right">
+        <div class="heading">
+          <a href="#" id="heading">Solves</a>
+        </div>
+        <div><button id="clear">Clear Times</button></div>
+        <div id="eventSelected">3x3x3</div>
+
         <div id="listOfTime"></div>
+        <scramble-display id="scrambleGenerator"></scramble-display>
       </div>
     </div>
     <script src="scramble-display.bundle-global.js"></script>
     <script src="utilities.js"></script>
+    <script src="solve.js"></script>
     <script src="constant.js"></script>
     <script src="Cube.js"></script>
     <script src="scrambler.js"></script>
