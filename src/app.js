@@ -6,7 +6,8 @@ var msDisplay = document.querySelector("#milliSec");
 var secDisplay = document.querySelector("#second");
 var minDisplay = document.querySelector("#minute");
 var minColon = document.querySelector("#minColon");
-var timeList = document.querySelector("#listOfTime");
+// var timeList = document.querySelector("#listOfTime");
+var resutlTable = document.querySelector(".resultTable")
 var eventSelected = document.querySelector("#eventSelected");
 var puzzle = document.querySelector("#puzzle");
 var scramble = document.querySelector("#scramble");
@@ -90,7 +91,7 @@ function run() {
     minColon.innerHTML = "";
     running = true;
 
-    timeList.scrollTop = timeList.scrollHeight;
+    // timeList.scrollTop = timeList.scrollHeight;
     interval = setInterval(timer, 10);
 
   } else if (running) {
@@ -99,21 +100,36 @@ function run() {
 
     createResultList()
 
-    let timeElement = document.createElement("span")
-    timeElement.className = "timeResult"
-    // timeElement.id = cubeTimer.scrambleList.length
-    timeElement.id = cubeTimer.timeList.length
-    timeList.appendChild(timeElement)
-    timeElement.innerText = " " + displayTime.innerText.split(" ").join("") + " "
-
-    timeElement.addEventListener("click", function (e) {
-      createResultDialog(e.target.id - 1)
-    })
     calculateStats();
-    timeList.scrollTop = timeList.scrollHeight;
+    creatTimeResult(cubeTimer.timeList.length);
+    // timeList.scrollTop = timeList.scrollHeight;
     storeValue();
     scrambleGenerator(false)
   }
+}
+
+function creatTimeResult(no) {
+  let trEl = document.createElement("tr")
+  let noThEl = document.createElement("th")
+  noThEl.innerHTML = no
+
+  trEl.appendChild(noThEl)
+
+  let timeThEl = document.createElement("th")
+  timeThEl.id = no
+  timeThEl.innerHTML = " " + displayTime.innerText.split(" ").join("") + " "
+  trEl.appendChild(timeThEl)
+
+  let ao5thEl = document.createElement("th")
+  ao5thEl.innerHTML = no >= 5 ? formatTime(cubeTimer.averageOf5) : "-"
+  trEl.appendChild(ao5thEl)
+
+  let ao12thEl = document.createElement("th")
+  ao12thEl.innerHTML = no >= 12 ? formatTime(cubeTimer.averageOf12) : "-"
+  trEl.appendChild(ao12thEl)
+
+  resutlTable.insertBefore(trEl, resutlTable.children[1])
+
 }
 
 function createResultDialog(id) {
@@ -212,12 +228,13 @@ function drawScramble(scram) {
   scrambleGeneratorEl.setAttribute("visualization", "2D")
 }
 
-timeList.scrollTop = timeList.scrollHeight;
+// timeList.scrollTop = timeList.scrollHeight;
 
 puzzle.addEventListener("change", function () {
+  storeValue();
   puzzleSelected = puzzle.value;
-  clearTimes()
   cubeTimer = new CubeTimer(puzzleSelected, [], [], Infinity, -Infinity, 0, 0, 0)
+  clearTimes()
   if (localStorage) {
     viewStoreValue(puzzleSelected)
   }
@@ -272,21 +289,17 @@ clearAll.addEventListener("click", function () {
 
 // clear times function
 function clearTimes() {
-  cubeTimer.clearAll()
-  timeList.innerHTML = [];
+  // cubeTimer.clearAll()
+  resutlTable.innerHTML = `\n              <tbody><tr>\n                <th>No.</th>\n                <th>time</th>\n                <th>ao5</th>\n                <th>ao12</th>\n              </tr>\n            </tbody>`
   numSolvesOut.innerHTML = "Solves: ";
   bestOut.innerHTML = "Best: ";
   averageOf12.innerHTML = "Ao12: ";
   averageOf5.innerHTML = "Ao5: ";
-  storeValue();
 }
 
 function handleAfterDeleteResult(id) {
 
   let numSolves = cubeTimer.timeList.length
-
-  let spanTimeList = document.querySelectorAll(".timeResult")
-  timeList.removeChild(spanTimeList[id])
 
   numSolvesOut.innerHTML = "Solves: " + numSolves;
   bestOut.innerHTML = "Best: " + formatTime(cubeTimer.bestSingle)
@@ -381,15 +394,7 @@ function viewStoreValue(puzzleName) {
     if (cubeTimer.averageOf5 > 0) averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5);
 
     for (let i = 0; i < cubeTimer.timeList.length; i++) {
-      let timeElement = document.createElement("span")
-      timeElement.className = "timeResult"
-      timeElement.id = i
-      timeList.appendChild(timeElement)
-      timeElement.innerText = " " + formatTime(cubeTimer.timeList[i]) + " "
-
-      timeElement.addEventListener("click", function (e) {
-        createResultDialog(e.target.id)
-      })
+      creatTimeResult(i + 1)
     }
   }
 }

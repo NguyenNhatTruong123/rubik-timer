@@ -425,6 +425,8 @@ a:focus {
 
 .statistic {
     width: 90%;
+    font-size: larger;
+    font-family: monospace;
 }
 
 .scrollTable {
@@ -445,7 +447,8 @@ tr {
     width: 100%;
 }
 
-.resultTable {
+.resultTable,
+.resultTable1 {
     width: 100%;
 }
 
