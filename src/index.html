@@ -84,6 +84,11 @@
             <span id="ao12">Ao12: </span><br />
             <span id="best">Best: </span>
           </div>
+          <div class="stats-content1">
+            <span id="minAo5">Best Ao5: </span><br />
+            <span id="minAo12">Best Ao12: </span><br />
+            <span id="meanTime">Mean: </span>
+          </div>
         </div>
       </div>
 
@@ -94,7 +99,19 @@
         <div><button id="clear">Clear Times</button></div>
         <div id="eventSelected">3x3x3</div>
 
-        <div id="listOfTime"></div>
+        <!-- <div id="listOfTime"></div> -->
+        <div class="statistic">
+          <div class="scrollTable">
+            <table class="resultTable">
+              <tr>
+                <th>No.</th>
+                <th>time</th>
+                <th>ao5</th>
+                <th>ao12</th>
+              </tr>
+            </table>
+          </div>
+        </div>
         <scramble-display id="scrambleGenerator"></scramble-display>
       </div>
     </div>
