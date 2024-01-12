@@ -443,12 +443,16 @@ th {
     border-radius: 5px;
 }
 
+/* th:hover {
+    background-color: #999;
+    text-decoration: underline;
+} */
+
 tr {
     width: 100%;
 }
 
-.resultTable,
-.resultTable1 {
+.resultTable {
     width: 100%;
 }
 
@@ -463,4 +467,17 @@ tr {
     font-size: larger;
     border: double;
     border-radius: 10px;
+}
+
+.solve {
+    cursor: pointer
+}
+
+.solve:hover {
+    background-color: #999;
+    text-decoration: underline;
+}
+
+.swal-modal {
+    width: 1000px !important
 }

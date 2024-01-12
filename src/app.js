@@ -1,18 +1,18 @@
-// const CubeTimer = require('./Cube')
-// import { ScrambleGenerator2x2, ScrambleGenerator3x3, ScrambleGenerator4x4, ScrambleGenerator5x5, ScrambleGenerator6x6, ScrambleGenerator7x7 } from "./scrambler"
-// import { CUBE_2X2X2, CUBE_3X3X3, CUBE_4X4X4, CUBE_5X5X5, CUBE_6X6X6, CUBE_7X7X7, CUBE_LABEL, move2x2x2, move3x3x3, move4x4x4, move5x5x5, move6x6x6, move7x7x7 } from "./constant"
-
 var msDisplay = document.querySelector("#milliSec");
 var secDisplay = document.querySelector("#second");
 var minDisplay = document.querySelector("#minute");
 var minColon = document.querySelector("#minColon");
-// var timeList = document.querySelector("#listOfTime");
 var resutlTable = document.querySelector(".resultTable")
 var eventSelected = document.querySelector("#eventSelected");
 var puzzle = document.querySelector("#puzzle");
 var scramble = document.querySelector("#scramble");
 var clearAll = document.querySelector("#clear");
 var scrambleGeneratorEl = document.getElementById("scrambleGenerator")
+
+var minAo5 = document.querySelector("#minAo5");
+var minAo12 = document.querySelector("#minAo12");
+var meanTime = document.querySelector("#meanTime");
+
 
 var puzzleSelected;
 // new variables stats
@@ -91,7 +91,6 @@ function run() {
     minColon.innerHTML = "";
     running = true;
 
-    // timeList.scrollTop = timeList.scrollHeight;
     interval = setInterval(timer, 10);
 
   } else if (running) {
@@ -101,14 +100,13 @@ function run() {
     createResultList()
 
     calculateStats();
-    creatTimeResult(cubeTimer.timeList.length);
-    // timeList.scrollTop = timeList.scrollHeight;
+    creatTimeResult(cubeTimer.timeList.length, false);
     storeValue();
     scrambleGenerator(false)
   }
 }
 
-function creatTimeResult(no) {
+function creatTimeResult(no, isFromStoreValue) {
   let trEl = document.createElement("tr")
   let noThEl = document.createElement("th")
   noThEl.innerHTML = no
@@ -116,19 +114,118 @@ function creatTimeResult(no) {
   trEl.appendChild(noThEl)
 
   let timeThEl = document.createElement("th")
+  timeThEl.className = "solve"
   timeThEl.id = no
-  timeThEl.innerHTML = " " + displayTime.innerText.split(" ").join("") + " "
+  timeThEl.innerHTML = isFromStoreValue ? cubeTimer.timeList[no - 1].time : " " + displayTime.innerText.split(" ").join("") + " "
+  timeThEl.addEventListener("click", function (e) {
+    createResultDialog(e.target.id - 1)
+  })
   trEl.appendChild(timeThEl)
 
   let ao5thEl = document.createElement("th")
-  ao5thEl.innerHTML = no >= 5 ? formatTime(cubeTimer.averageOf5) : "-"
+  ao5thEl.className = "solve"
+  if (no >= 5) {
+    cubeTimer.computeAverage(5, no - 1)
+    ao5thEl.id = cubeTimer.averageOf5
+    ao5thEl.innerHTML = ao5thEl.id
+    ao5thEl.addEventListener("click", function (e) {
+      creatAo5Dialog(ao5thEl.id, no - 1)
+    })
+  } else {
+    ao5thEl.innerHTML = "-"
+  }
   trEl.appendChild(ao5thEl)
 
   let ao12thEl = document.createElement("th")
-  ao12thEl.innerHTML = no >= 12 ? formatTime(cubeTimer.averageOf12) : "-"
+  ao12thEl.className = "solve"
+  if (no >= 12) {
+    cubeTimer.computeAverage(12, no - 1)
+    ao12thEl.id = cubeTimer.averageOf12
+    ao12thEl.innerHTML = ao12thEl.id
+    ao12thEl.addEventListener("click", function (e) {
+      createAo12Dialog(ao12thEl.id, no - 1)
+    })
+  } else {
+    ao12thEl.innerHTML = "-"
+  }
   trEl.appendChild(ao12thEl)
 
   resutlTable.insertBefore(trEl, resutlTable.children[1])
+
+}
+
+function createAo12Dialog(avgTime, id) {
+  let min = cubeTimer.timeList[id].time
+  let minIndex = id
+  let max = cubeTimer.timeList[id].time
+  let maxIndex = id
+
+  for (let i = id - 11; i < id; i++) {
+    if (cubeTimer.timeList[i].time <= min) {
+      min = cubeTimer.timeList[i].time
+      minIndex = i
+    }
+
+    if (cubeTimer.timeList[i].time >= max) {
+      max = cubeTimer.timeList[i].time
+      maxIndex = i
+    }
+  }
+
+  let resultDisplayText = ""
+  for (let i = id - 11; i <= id; i++) {
+    if (i === minIndex || i === maxIndex) {
+      resultDisplayText += (i % 12 + 1).toString() + ".\u00A0\u00A0(" + cubeTimer.timeList[i].time.toString() + ")\u00A0\u00A0\u00A0\u00A0\u00A0"
+    } else {
+      resultDisplayText += (i % 12 + 1).toString() + ".\u00A0\u00A0" + cubeTimer.timeList[i].time.toString() + "\u00A0\u00A0\u00A0\u00A0\u00A0"
+    }
+    resultDisplayText += cubeTimer.timeList[i].scramble + "\n\n"
+  }
+
+  swal({
+    title: avgTime,
+    text: resultDisplayText,
+    buttons: { cancel: "Cancel" }
+  }).then(() => {
+    swal.close()
+  })
+}
+
+function creatAo5Dialog(avgTime, id) {
+  let min = cubeTimer.timeList[id].time
+  let minIndex = id
+  let max = cubeTimer.timeList[id].time
+  let maxIndex = id
+
+  for (let i = id - 4; i < id; i++) {
+    if (cubeTimer.timeList[i].time <= min) {
+      min = cubeTimer.timeList[i].time
+      minIndex = i
+    }
+
+    if (cubeTimer.timeList[i].time >= max) {
+      max = cubeTimer.timeList[i].time
+      maxIndex = i
+    }
+  }
+
+  let resultDisplayText = ""
+  for (let i = id - 4; i <= id; i++) {
+    if (i === minIndex || i === maxIndex) {
+      resultDisplayText += (i % 5 + 1).toString() + ".\u00A0\u00A0(" + cubeTimer.timeList[i].time.toString() + ")\u00A0\u00A0\u00A0\u00A0\u00A0"
+    } else {
+      resultDisplayText += (i % 5 + 1).toString() + ".\u00A0\u00A0" + cubeTimer.timeList[i].time.toString() + "\u00A0\u00A0\u00A0\u00A0\u00A0"
+    }
+    resultDisplayText += cubeTimer.timeList[i].scramble + "\n\n"
+  }
+
+  swal({
+    title: avgTime,
+    text: resultDisplayText,
+    buttons: { cancel: "Cancel" }
+  }).then((value) => {
+    swal.close()
+  })
 
 }
 
@@ -228,8 +325,6 @@ function drawScramble(scram) {
   scrambleGeneratorEl.setAttribute("visualization", "2D")
 }
 
-// timeList.scrollTop = timeList.scrollHeight;
-
 puzzle.addEventListener("change", function () {
   storeValue();
   puzzleSelected = puzzle.value;
@@ -289,7 +384,6 @@ clearAll.addEventListener("click", function () {
 
 // clear times function
 function clearTimes() {
-  // cubeTimer.clearAll()
   resutlTable.innerHTML = `\n              <tbody><tr>\n                <th>No.</th>\n                <th>time</th>\n                <th>ao5</th>\n                <th>ao12</th>\n              </tr>\n            </tbody>`
   numSolvesOut.innerHTML = "Solves: ";
   bestOut.innerHTML = "Best: ";
@@ -305,11 +399,11 @@ function handleAfterDeleteResult(id) {
   bestOut.innerHTML = "Best: " + formatTime(cubeTimer.bestSingle)
 
   if (numSolves >= 5) {
-    cubeTimer.computeAverage(5)
+    cubeTimer.computeAverage(5, cubeTimer.timeList.length - 1)
     averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5)
   }
   if (numSolves >= 12) {
-    cubeTimer.computeAverage(12)
+    cubeTimer.computeAverage(12, cubeTimer.timeList.length - 1)
     averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12)
   }
 }
@@ -344,11 +438,11 @@ function calculateStats() {
   bestOut.innerHTML = "Best: " + formatTime(cubeTimer.bestSingle)
 
   if (numSolves >= 5) {
-    cubeTimer.computeAverage(5)
+    cubeTimer.computeAverage(5, cubeTimer.timeList.length - 1)
     averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5)
   }
   if (numSolves >= 12) {
-    cubeTimer.computeAverage(12)
+    cubeTimer.computeAverage(12, cubeTimer.timeList.length - 1)
     averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12)
   }
 
@@ -394,7 +488,7 @@ function viewStoreValue(puzzleName) {
     if (cubeTimer.averageOf5 > 0) averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5);
 
     for (let i = 0; i < cubeTimer.timeList.length; i++) {
-      creatTimeResult(i + 1)
+      creatTimeResult(i + 1, true)
     }
   }
 }
