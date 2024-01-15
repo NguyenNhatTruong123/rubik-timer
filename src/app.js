@@ -393,6 +393,8 @@ clearAll.addEventListener("click", function () {
       .then((value) => {
         switch (value) {
           case "delete":
+            cubeTimer = new CubeTimer(puzzleSelected, [], [], Infinity, -Infinity, 0, 0, 0)
+            storeValue()
             clearTimes()
             break;
           default:
@@ -493,6 +495,13 @@ function formatTime(t) {
 // window.onkeyup = run;
 document.addEventListener("keydown", (e) => {
   if (e.code === "Space") {
+    displayTime.style.color = "brown"
+  }
+});
+
+document.addEventListener("keyup", (e) => {
+  if (e.code === "Space") {
+    displayTime.style.color = ""
     currentScramble = scramble.innerText
     run();
   }
