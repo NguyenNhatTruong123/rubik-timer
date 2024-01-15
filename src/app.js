@@ -9,9 +9,9 @@ var scramble = document.querySelector("#scramble");
 var clearAll = document.querySelector("#clear");
 var scrambleGeneratorEl = document.getElementById("scrambleGenerator")
 
-var minAo5 = document.querySelector("#minAo5");
-var minAo12 = document.querySelector("#minAo12");
-var meanTime = document.querySelector("#meanTime");
+var minAo5 = document.querySelector(".minAo5");
+var minAo12 = document.querySelector(".minAo12");
+var meanTime = document.querySelector(".meanTime");
 
 
 var puzzleSelected;
@@ -116,7 +116,7 @@ function creatTimeResult(no, isFromStoreValue) {
   let timeThEl = document.createElement("th")
   timeThEl.className = "solve"
   timeThEl.id = no
-  timeThEl.innerHTML = isFromStoreValue ? cubeTimer.timeList[no - 1].time : " " + displayTime.innerText.split(" ").join("") + " "
+  timeThEl.innerHTML = isFromStoreValue ? cubeTimer.timeList[no - 1].time.toFixed(2) : " " + displayTime.innerText.split(" ").join("") + " "
   timeThEl.addEventListener("click", function (e) {
     createResultDialog(e.target.id - 1)
   })
@@ -126,11 +126,18 @@ function creatTimeResult(no, isFromStoreValue) {
   ao5thEl.className = "solve"
   if (no >= 5) {
     cubeTimer.computeAverage(5, no - 1)
-    ao5thEl.id = cubeTimer.averageOf5
+    ao5thEl.id = cubeTimer.averageOf5.toFixed(2)
     ao5thEl.innerHTML = ao5thEl.id
     ao5thEl.addEventListener("click", function (e) {
-      creatAo5Dialog(ao5thEl.id, no - 1)
+      createAo5Dialog(ao5thEl.id, no - 1)
     })
+
+    minAo5.innerHTML = "Best Ao5: " + cubeTimer.bestAo5[0].toFixed(2)
+    minAo5.id = cubeTimer.bestAo5[1]
+    minAo5.addEventListener("click", function (e) {
+      createAo5Dialog(cubeTimer.bestAo5[0], cubeTimer.bestAo5[1])
+    })
+
   } else {
     ao5thEl.innerHTML = "-"
   }
@@ -140,11 +147,18 @@ function creatTimeResult(no, isFromStoreValue) {
   ao12thEl.className = "solve"
   if (no >= 12) {
     cubeTimer.computeAverage(12, no - 1)
-    ao12thEl.id = cubeTimer.averageOf12
+    ao12thEl.id = cubeTimer.averageOf12.toFixed(2)
     ao12thEl.innerHTML = ao12thEl.id
     ao12thEl.addEventListener("click", function (e) {
       createAo12Dialog(ao12thEl.id, no - 1)
     })
+
+    minAo12.innerHTML = "Best Ao12: " + cubeTimer.bestAo12[0].toFixed(2)
+    minAo12.id = cubeTimer.bestAo12[1]
+    minAo12.addEventListener("click", function (e) {
+      createAo12Dialog(cubeTimer.bestAo12[0], cubeTimer.bestAo12[1])
+    })
+
   } else {
     ao12thEl.innerHTML = "-"
   }
@@ -159,6 +173,8 @@ function createAo12Dialog(avgTime, id) {
   let minIndex = id
   let max = cubeTimer.timeList[id].time
   let maxIndex = id
+
+  let counting = 1
 
   for (let i = id - 11; i < id; i++) {
     if (cubeTimer.timeList[i].time <= min) {
@@ -175,11 +191,12 @@ function createAo12Dialog(avgTime, id) {
   let resultDisplayText = ""
   for (let i = id - 11; i <= id; i++) {
     if (i === minIndex || i === maxIndex) {
-      resultDisplayText += (i % 12 + 1).toString() + ".\u00A0\u00A0(" + cubeTimer.timeList[i].time.toString() + ")\u00A0\u00A0\u00A0\u00A0\u00A0"
+      resultDisplayText += counting.toString() + ".\u00A0\u00A0(" + cubeTimer.timeList[i].time.toFixed(2) + ")\u00A0\u00A0\u00A0\u00A0\u00A0"
     } else {
-      resultDisplayText += (i % 12 + 1).toString() + ".\u00A0\u00A0" + cubeTimer.timeList[i].time.toString() + "\u00A0\u00A0\u00A0\u00A0\u00A0"
+      resultDisplayText += counting.toString() + ".\u00A0\u00A0" + cubeTimer.timeList[i].time.toFixed(2) + "\u00A0\u00A0\u00A0\u00A0\u00A0"
     }
     resultDisplayText += cubeTimer.timeList[i].scramble + "\n\n"
+    counting++
   }
 
   swal({
@@ -191,11 +208,13 @@ function createAo12Dialog(avgTime, id) {
   })
 }
 
-function creatAo5Dialog(avgTime, id) {
+function createAo5Dialog(avgTime, id) {
   let min = cubeTimer.timeList[id].time
   let minIndex = id
   let max = cubeTimer.timeList[id].time
   let maxIndex = id
+
+  let counting = 1
 
   for (let i = id - 4; i < id; i++) {
     if (cubeTimer.timeList[i].time <= min) {
@@ -212,11 +231,12 @@ function creatAo5Dialog(avgTime, id) {
   let resultDisplayText = ""
   for (let i = id - 4; i <= id; i++) {
     if (i === minIndex || i === maxIndex) {
-      resultDisplayText += (i % 5 + 1).toString() + ".\u00A0\u00A0(" + cubeTimer.timeList[i].time.toString() + ")\u00A0\u00A0\u00A0\u00A0\u00A0"
+      resultDisplayText += counting.toString() + ".\u00A0\u00A0(" + cubeTimer.timeList[i].time.toFixed(2) + ")\u00A0\u00A0\u00A0\u00A0\u00A0"
     } else {
-      resultDisplayText += (i % 5 + 1).toString() + ".\u00A0\u00A0" + cubeTimer.timeList[i].time.toString() + "\u00A0\u00A0\u00A0\u00A0\u00A0"
+      resultDisplayText += counting.toString() + ".\u00A0\u00A0" + cubeTimer.timeList[i].time.toFixed(2) + "\u00A0\u00A0\u00A0\u00A0\u00A0"
     }
     resultDisplayText += cubeTimer.timeList[i].scramble + "\n\n"
+    counting++
   }
 
   swal({
@@ -384,7 +404,12 @@ clearAll.addEventListener("click", function () {
 
 // clear times function
 function clearTimes() {
-  resutlTable.innerHTML = `\n              <tbody><tr>\n                <th>No.</th>\n                <th>time</th>\n                <th>ao5</th>\n                <th>ao12</th>\n              </tr>\n            </tbody>`
+  resutlTable.innerHTML = `<thead>
+  <th>No.</th>
+  <th>time</th>
+  <th>ao5</th>
+  <th>ao12</th>
+</thead>`
   numSolvesOut.innerHTML = "Solves: ";
   bestOut.innerHTML = "Best: ";
   averageOf12.innerHTML = "Ao12: ";

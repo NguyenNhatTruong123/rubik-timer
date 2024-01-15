@@ -6,6 +6,8 @@ class CubeTimer {
         this.worstSingle = worstSingle
         this.averageOf5 = averageOf5
         this.averageOf12 = averageOf12
+        this.bestAo5 = [Infinity, 0]
+        this.bestAo12 = [Infinity, 0]
         this.meanTime = 0
     }
 
@@ -30,7 +32,6 @@ class CubeTimer {
         var worst = -Infinity
 
         var sum = 0
-        // var index = this.timeList.length - 1
         for (let i = 1; i <= counting; i++) {
             let time = this.timeList[index].time
             if (time < best) best = time
@@ -40,8 +41,19 @@ class CubeTimer {
         }
 
         sum = sum - best - worst
-        if (counting === 5) this.averageOf5 = Math.round((sum / 3) * 100) / 100
-        if (counting === 12) this.averageOf12 = Math.round((sum / 10) * 100) / 100
+        if (counting === 5) {
+            this.averageOf5 = Math.round((sum / 3) * 100) / 100
+            if (this.averageOf5 < this.bestAo5[0]) {
+                this.bestAo5 = [this.averageOf5, index + counting]
+            }
+        }
+        if (counting === 12) {
+            this.averageOf12 = Math.round((sum / 10) * 100) / 100
+            if (this.averageOf12 < this.bestAo12[0]) {
+                this.bestAo12 = [this.averageOf12, index + counting]
+            }
+        }
+
     }
 
     computeMean() {

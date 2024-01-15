@@ -147,7 +147,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 1% 20% 20% 20%;
+    /* margin: 1% 20% 20% 20%; */
 }
 
 .footer-container {
@@ -443,13 +443,14 @@ th {
     border-radius: 5px;
 }
 
-/* th:hover {
-    background-color: #999;
-    text-decoration: underline;
-} */
-
 tr {
     width: 100%;
+}
+
+table thead th {
+    position: sticky;
+    top: 0;
+    background: black;
 }
 
 .resultTable {
@@ -480,4 +481,17 @@ tr {
 
 .swal-modal {
     width: 1000px !important
+}
+
+.minAo5,
+.minAo12,
+.meanTime {
+    cursor: pointer
+}
+
+.minAo5:hover,
+.minAo12:hover,
+.meanTime:hover {
+    background-color: #999;
+    text-decoration: underline;
 }
