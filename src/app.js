@@ -243,7 +243,7 @@ function createAo5Dialog(avgTime, id) {
     title: avgTime,
     text: resultDisplayText,
     buttons: { cancel: "Cancel" }
-  }).then((value) => {
+  }).then(() => {
     swal.close()
   })
 
@@ -252,7 +252,7 @@ function createAo5Dialog(avgTime, id) {
 function createResultDialog(id) {
   var thisTime = cubeTimer.timeList[id].time
   swal({
-    title: thisTime,
+    title: thisTime.toFixed(2),
     text: cubeTimer.timeList[id].scramble,
     buttons: {
       delete: "Delete",
@@ -273,15 +273,14 @@ function createResultDialog(id) {
           })
             .then((willDelete) => {
               if (willDelete) {
-                cubeTimer.deleteResult(id);
                 handleAfterDeleteResult(id);
                 storeValue();
               }
             });
           break;
         case "plusTwo":
-          cubeTimer.timeList[id] += 2;
-          handleAfterDeleteResult();
+          cubeTimer.timeList[id].time += 2;
+          handleAfterPlusTwo(id);
           storeValue()
           break;
 
@@ -332,7 +331,7 @@ function scrambleGenerator(isNewSession) {
   }
   drawScramble(currentScramble)
   if (isNewSession) {
-    cubeTimer = new CubeTimer(puzzleSelected, [], 10000000, 0, 0, 0)
+    cubeTimer = newCuberTimer()
     if (localStorage) {
       viewStoreValue(puzzleSelected)
     }
@@ -348,7 +347,7 @@ function drawScramble(scram) {
 puzzle.addEventListener("change", function () {
   storeValue();
   puzzleSelected = puzzle.value;
-  cubeTimer = new CubeTimer(puzzleSelected, [], [], Infinity, -Infinity, 0, 0, 0)
+  cubeTimer = newCuberTimer()
   clearTimes()
   if (localStorage) {
     viewStoreValue(puzzleSelected)
@@ -393,7 +392,7 @@ clearAll.addEventListener("click", function () {
       .then((value) => {
         switch (value) {
           case "delete":
-            cubeTimer = new CubeTimer(puzzleSelected, [], [], Infinity, -Infinity, 0, 0, 0)
+            cubeTimer = newCuberTimer()
             storeValue()
             clearTimes()
             break;
@@ -419,24 +418,55 @@ function clearTimes() {
 }
 
 function handleAfterDeleteResult(id) {
-
+  cubeTimer.timeList.splice(id, 1)
   let numSolves = cubeTimer.timeList.length
 
+  if (id === cubeTimer.bestStackTraceIndex[0]) {
+    cubeTimer.bestStackTraceIndex.shift()
+    bestOut.innerHTML = "Best: " + formatTime(cubeTimer.timeList[cubeTimer.bestStackTraceIndex[0]].time)
+  }
+
+  resutlTable.deleteRow(numSolves + 1 - id)
+
+  for (let i = 1, row; row = resutlTable.rows[i], i <= numSolves - id; i++) {
+    row.cells[1].id = row.cells[1].id - 1
+    row.cells[0].innerHTML = row.cells[1].id
+
+    if (numSolves >= 12) {
+      cubeTimer.computeAverage(12, numSolves - i)
+      row.cells[3].innerHTML = cubeTimer.averageOf12.toFixed(2)
+      row.cells[3].removeEventListener("click", createAo12Dialog, false);
+      row.cells[3].addEventListener("click", function () {
+        createAo12Dialog(cubeTimer.averageOf12.toFixed(2), numSolves - i)
+      })
+    } else if (numSolves >= 5) {
+      cubeTimer.computeAverage(5, numSolves - i)
+      row.cells[2].innerHTML = cubeTimer.averageOf5.toFixed(2)
+      row.cells[2].removeEventListener("click", createAo5Dialog, false);
+      row.cells[2].addEventListener("click", function () {
+        createAo5Dialog(cubeTimer.averageOf5.toFixed(2), numSolves - i)
+      })
+      row.cells[3].innerHTML = "-"
+      row.cells[3].removeEventListener("click", createAo12Dialog, false);
+    } else {
+      row.cells[2].innerHTML = "-"
+      row.cells[3].innerHTML = "-"
+      row.cells[3].removeEventListener("click", createAo12Dialog, false);
+      row.cells[2].removeEventListener("click", createAo5Dialog, false);
+    }
+
+  }
+
   numSolvesOut.innerHTML = "Solves: " + numSolves;
-  bestOut.innerHTML = "Best: " + formatTime(cubeTimer.bestSingle)
 
   if (numSolves >= 5) {
-    cubeTimer.computeAverage(5, cubeTimer.timeList.length - 1)
+    cubeTimer.computeAverage(5, numSolves - 1)
     averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5)
   }
   if (numSolves >= 12) {
-    cubeTimer.computeAverage(12, cubeTimer.timeList.length - 1)
+    cubeTimer.computeAverage(12, numSolves - 1)
     averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12)
   }
-}
-
-function handleAfterPlusTwo(id) {
-
 }
 
 //stats
@@ -444,15 +474,11 @@ function calculateStats() {
   let numSolves = cubeTimer.timeList.length
   numSolvesOut.innerHTML = "Solves: " + numSolves;
 
-  let start = numSolves - 1
-  let currentTime = cubeTimer.timeList[start].time
-
   if (numSolves === 1) {
-    cubeTimer.bestSingle = currentTime
-    cubeTimer.worstSingle = currentTime
+    cubeTimer.bestStackTraceIndex.unshift(0)
   } else {
-    if (currentTime < cubeTimer.bestSingle) {
-      cubeTimer.bestSingle = currentTime
+    if (cubeTimer.timeList[numSolves - 1].time < cubeTimer.timeList[cubeTimer.bestStackTraceIndex[0]].time) {
+      cubeTimer.bestStackTraceIndex.unshift(numSolves - 1)
       if (numSolves > 1) {
         swal("Congratulations", "You just set a new PB.", "success", {
           buttons: true,
@@ -461,8 +487,7 @@ function calculateStats() {
       }
     }
   }
-  if (currentTime > cubeTimer.worstSingle) cubeTimer.worstSingle = currentTime
-  bestOut.innerHTML = "Best: " + formatTime(cubeTimer.bestSingle)
+  bestOut.innerHTML = "Best: " + formatTime(cubeTimer.timeList[cubeTimer.bestStackTraceIndex[0]].time)
 
   if (numSolves >= 5) {
     cubeTimer.computeAverage(5, cubeTimer.timeList.length - 1)
@@ -492,7 +517,6 @@ function formatTime(t) {
   return out;
 }
 
-// window.onkeyup = run;
 document.addEventListener("keydown", (e) => {
   if (e.code === "Space") {
     displayTime.style.color = "brown"
@@ -517,7 +541,7 @@ function viewStoreValue(puzzleName) {
     cubeTimer = fromJson(storeResult)
 
     numSolvesOut.innerHTML = "Solves: " + cubeTimer.timeList.length;
-    if (cubeTimer.bestSingle > 0) bestOut.innerHTML = "Best: " + formatTime(cubeTimer.bestSingle)
+    if (cubeTimer.timeList.length > 0 && cubeTimer.timeList[cubeTimer.bestStackTraceIndex[0]].time > 0) bestOut.innerHTML = "Best: " + formatTime(cubeTimer.timeList[cubeTimer.bestStackTraceIndex[0]].time)
     if (cubeTimer.averageOf12 > 0) averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12);
     if (cubeTimer.averageOf5 > 0) averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5);
 
@@ -527,15 +551,18 @@ function viewStoreValue(puzzleName) {
   }
 }
 
+function newCuberTimer() {
+  return new CubeTimer(puzzleSelected, [], 0, 0, [])
+}
+
 function fromJson(jData) {
   var data = JSON.parse(jData)
   return new CubeTimer(
     data.cubeName,
     data.timeList,
-    data.bestSingle,
-    data.worstSingle,
     data.averageOf5,
     data.averageOf12,
+    data.bestStackTraceIndex
   )
 }
 

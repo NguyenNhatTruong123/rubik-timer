@@ -1,37 +1,29 @@
 class CubeTimer {
-    constructor(cubeName, timeList, bestSingle, worstSingle, averageOf5, averageOf12) {
+    constructor(cubeName, timeList, averageOf5, averageOf12, bestStackTraceIndex) {
         this.cubeName = cubeName
         this.timeList = timeList
-        this.bestSingle = bestSingle
-        this.worstSingle = worstSingle
         this.averageOf5 = averageOf5
         this.averageOf12 = averageOf12
         this.bestAo5 = [Infinity, 0]
         this.bestAo12 = [Infinity, 0]
+        this.bestStackTraceIndex = bestStackTraceIndex
         this.meanTime = 0
     }
 
     clearAll() {
         this.timeList = []
-        this.bestSingle = Infinity
-        this.worstSingle = -Infinity
         this.averageOf5 = 0
         this.averageOf12 = 0
-    }
-
-    deleteResult(id) {
-        let currentTime = this.timeList[id].time;
-        this.timeList.splice(id, 1);
-        if (currentTime === this.bestSingle) {
-            this.bestSingle = Math.min.apply(null, this.timeList);
-        }
+        this.bestAo5 = [Infinity, 0]
+        this.bestAo12 = [Infinity, 0]
+        this.bestStackTraceIndex = []
     }
 
     computeAverage(counting, index) {
-        var best = Infinity
-        var worst = -Infinity
+        let best = Infinity
+        let worst = -Infinity
 
-        var sum = 0
+        let sum = 0
         for (let i = 1; i <= counting; i++) {
             let time = this.timeList[index].time
             if (time < best) best = time
@@ -68,10 +60,13 @@ class CubeTimer {
         return JSON.stringify({
             cubeName: this.cubeName,
             timeList: this.timeList,
-            bestSingle: this.bestSingle,
-            worstSingle: this.worstSingle,
             averageOf5: this.averageOf5,
             averageOf12: this.averageOf12,
+            bestAo5: this.bestAo5,
+            bestAo12: this.bestAo12,
+            bestAo5: this.bestAo5,
+            bestAo12: this.bestAo12,
+            bestStackTraceIndex: this.bestStackTraceIndex
         });
     }
 }
