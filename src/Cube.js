@@ -1,12 +1,12 @@
 class CubeTimer {
-    constructor(cubeName, timeList, averageOf5, averageOf12, bestStackTraceIndex) {
+    constructor(cubeName, timeList, averageOf5, averageOf12, resultTree) {
         this.cubeName = cubeName
         this.timeList = timeList
         this.averageOf5 = averageOf5
         this.averageOf12 = averageOf12
         this.bestAo5 = [Infinity, 0]
         this.bestAo12 = [Infinity, 0]
-        this.bestStackTraceIndex = bestStackTraceIndex
+        this.resultTree = resultTree
         this.meanTime = 0
     }
 
@@ -66,7 +66,7 @@ class CubeTimer {
             bestAo12: this.bestAo12,
             bestAo5: this.bestAo5,
             bestAo12: this.bestAo12,
-            bestStackTraceIndex: this.bestStackTraceIndex
+            bestStackTraceIndex: this.resultTree
         });
     }
 }

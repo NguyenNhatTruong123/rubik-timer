@@ -4,5 +4,7 @@ class Solve {
         this.scramble = scramble
         this.isPlusTwo = isPlusTwo
         this.isDNF = isDNF
+        this.left = null
+        this.right = null
     }
 }

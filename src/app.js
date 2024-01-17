@@ -40,6 +40,10 @@ var currentScramble = ""
 
 var cubeTimer;
 
+var resultTree = new ResultTree()
+
+var bestSingle;
+
 function timer() {
   milliSec++;
   cs++; //counts time in centiseconds
@@ -116,7 +120,13 @@ function creatTimeResult(no, isFromStoreValue) {
   let timeThEl = document.createElement("th")
   timeThEl.className = "solve"
   timeThEl.id = no
-  timeThEl.innerHTML = isFromStoreValue ? cubeTimer.timeList[no - 1].time.toFixed(2) : " " + displayTime.innerText.split(" ").join("") + " "
+
+  if (isFromStoreValue) {
+    timeThEl.innerHTML = cubeTimer.timeList[no - 1].isPlusTwo ? cubeTimer.timeList[no - 1].time.toFixed(2) + "+" : cubeTimer.timeList[no - 1].time.toFixed(2)
+  } else {
+    timeThEl.innerHTML = " " + displayTime.innerText.split(" ").join("") + " "
+  }
+
   timeThEl.addEventListener("click", function (e) {
     createResultDialog(e.target.id - 1)
   })
@@ -279,9 +289,11 @@ function createResultDialog(id) {
             });
           break;
         case "plusTwo":
-          cubeTimer.timeList[id].time += 2;
-          handleAfterPlusTwo(id);
-          storeValue()
+          if (!cubeTimer.timeList[id].isPlusTwo) {
+            cubeTimer.timeList[id].time += 2;
+            handleAfterPlusTwo(id);
+            storeValue()
+          }
           break;
 
         default:
@@ -303,6 +315,18 @@ function createResultList() {
   let resultTime = displayTime.innerText.split(" ").join("")
   let solveInfo = new Solve(convertStringToTime(resultTime), currentScramble, false, false)
   cubeTimer.timeList.push(solveInfo)
+  resultTree.insert(solveInfo)
+  if (cubeTimer.timeList.length === 1) {
+    bestSingle = solveInfo
+  } else {
+    if (solveInfo.time < bestSingle.time) {
+      bestSingle = solveInfo
+      swal("Congratulations", "You just set a new PB.", "success", {
+        buttons: true,
+        timer: 10000,
+      });
+    }
+  }
 }
 
 function scrambleGenerator(isNewSession) {
@@ -417,14 +441,38 @@ function clearTimes() {
   averageOf5.innerHTML = "Ao5: ";
 }
 
+function handleBestSingle() {
+  if (cubeTimer.timeList.length > 0) {
+    resultTree.removeAll(cubeTimer.timeList[0])
+    for (re of cubeTimer.timeList) {
+      resultTree.insert(re)
+    }
+    bestSingle = resultTree.findMinNode(cubeTimer.timeList[0])
+    creatBestSingleElement()
+  }
+}
+
+function creatBestSingleElement() {
+  if (cubeTimer.timeList.length > 0) {
+    bestOut.innerHTML = "Best: " + formatTime(bestSingle.time)
+    bestOut.addEventListener("click", function () {
+      swal({
+        title: bestSingle.time.toFixed(2),
+        text: bestSingle.scramble,
+        buttons: {
+          cancel: "Cancel"
+        }
+      })
+        .then(() => {
+          swal.close();
+        })
+    })
+  }
+}
+
 function handleAfterDeleteResult(id) {
   cubeTimer.timeList.splice(id, 1)
   let numSolves = cubeTimer.timeList.length
-
-  if (id === cubeTimer.bestStackTraceIndex[0]) {
-    cubeTimer.bestStackTraceIndex.shift()
-    bestOut.innerHTML = "Best: " + formatTime(cubeTimer.timeList[cubeTimer.bestStackTraceIndex[0]].time)
-  }
 
   resutlTable.deleteRow(numSolves + 1 - id)
 
@@ -469,25 +517,53 @@ function handleAfterDeleteResult(id) {
   }
 }
 
+function handleAfterPlusTwo(id) {
+  let numSolves = cubeTimer.timeList.length
+  resutlTable.rows[numSolves - id].cells[1].innerHTML = cubeTimer.timeList[id].time.toFixed(2) + "+"
+  cubeTimer.timeList[id].isPlusTwo = true
+
+  handleBestSingle()
+
+  for (let i = id - 11; i <= id + 11; i++) {
+    if (cubeTimer.timeList[i]) {
+      let cellAo5 = resutlTable.rows[numSolves - i].cells[2]
+      let cellAo12 = resutlTable.rows[numSolves - i].cells[3]
+      if (i >= 4) {
+        cubeTimer.computeAverage(5, i)
+        cellAo5.innerHTML = cubeTimer.averageOf5.toFixed(2)
+        cellAo5.removeEventListener("click", createAo5Dialog, false);
+        cellAo5.addEventListener("click", function () {
+          createAo5Dialog(cubeTimer.averageOf5.toFixed(2), i)
+        })
+      }
+      if (i >= 11) {
+        cubeTimer.computeAverage(12, i)
+        cellAo12.innerHTML = cubeTimer.averageOf12.toFixed(2)
+        cellAo12.removeEventListener("click", createAo5Dialog, false);
+        cellAo12.addEventListener("click", function () {
+          createAo12Dialog(cubeTimer.averageOf12.toFixed(2), i)
+        })
+      }
+    }
+  }
+
+  if (numSolves >= 5) {
+    cubeTimer.computeAverage(5, numSolves - 1)
+    averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5)
+  }
+  if (numSolves >= 12) {
+    cubeTimer.computeAverage(12, numSolves - 1)
+    averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12)
+  }
+
+}
+
 //stats
 function calculateStats() {
   let numSolves = cubeTimer.timeList.length
   numSolvesOut.innerHTML = "Solves: " + numSolves;
 
-  if (numSolves === 1) {
-    cubeTimer.bestStackTraceIndex.unshift(0)
-  } else {
-    if (cubeTimer.timeList[numSolves - 1].time < cubeTimer.timeList[cubeTimer.bestStackTraceIndex[0]].time) {
-      cubeTimer.bestStackTraceIndex.unshift(numSolves - 1)
-      if (numSolves > 1) {
-        swal("Congratulations", "You just set a new PB.", "success", {
-          buttons: true,
-          timer: 10000,
-        });
-      }
-    }
-  }
-  bestOut.innerHTML = "Best: " + formatTime(cubeTimer.timeList[cubeTimer.bestStackTraceIndex[0]].time)
+  creatBestSingleElement()
 
   if (numSolves >= 5) {
     cubeTimer.computeAverage(5, cubeTimer.timeList.length - 1)
@@ -539,9 +615,10 @@ function viewStoreValue(puzzleName) {
   var storeResult = localStorage.getItem(puzzleName)
   if (storeResult) {
     cubeTimer = fromJson(storeResult)
+    resultTree = new ResultTree()
+    handleBestSingle()
 
     numSolvesOut.innerHTML = "Solves: " + cubeTimer.timeList.length;
-    if (cubeTimer.timeList.length > 0 && cubeTimer.timeList[cubeTimer.bestStackTraceIndex[0]].time > 0) bestOut.innerHTML = "Best: " + formatTime(cubeTimer.timeList[cubeTimer.bestStackTraceIndex[0]].time)
     if (cubeTimer.averageOf12 > 0) averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12);
     if (cubeTimer.averageOf5 > 0) averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5);
 
@@ -552,7 +629,7 @@ function viewStoreValue(puzzleName) {
 }
 
 function newCuberTimer() {
-  return new CubeTimer(puzzleSelected, [], 0, 0, [])
+  return new CubeTimer(puzzleSelected, [], 0, 0, resultTree)
 }
 
 function fromJson(jData) {
@@ -562,7 +639,7 @@ function fromJson(jData) {
     data.timeList,
     data.averageOf5,
     data.averageOf12,
-    data.bestStackTraceIndex
+    data.resultTree
   )
 }
 
