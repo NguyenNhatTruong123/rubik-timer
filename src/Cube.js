@@ -23,9 +23,22 @@ class CubeTimer {
         let best = Infinity
         let worst = -Infinity
 
+        let countDNF = 0
+
         let sum = 0
         for (let i = 1; i <= counting; i++) {
             let time = this.timeList[index].time
+            if (this.timeList[index].isDNF) {
+                countDNF++
+                time = 10000000
+            }
+
+            if (countDNF === 2) {
+                this.averageOf5 = "DNF"
+                this.averageOf12 = "DNF"
+                return
+            }
+
             if (time < best) best = time
             if (time > worst) worst = time
             sum += time

@@ -122,7 +122,11 @@ function creatTimeResult(no, isFromStoreValue) {
   timeThEl.id = no
 
   if (isFromStoreValue) {
-    timeThEl.innerHTML = cubeTimer.timeList[no - 1].isPlusTwo ? cubeTimer.timeList[no - 1].time.toFixed(2) + "+" : cubeTimer.timeList[no - 1].time.toFixed(2)
+
+    if (cubeTimer.timeList[no - 1].isPlusTwo) timeThEl.innerHTML = cubeTimer.timeList[no - 1].time.toFixed(2) + "+"
+    else if (cubeTimer.timeList[no - 1].isDNF) timeThEl.innerHTML = "DNF(" + cubeTimer.timeList[no - 1].time.toFixed(2) + ")"
+    else timeThEl.innerHTML = cubeTimer.timeList[no - 1].time.toFixed(2)
+
   } else {
     timeThEl.innerHTML = " " + displayTime.innerText.split(" ").join("") + " "
   }
@@ -136,7 +140,7 @@ function creatTimeResult(no, isFromStoreValue) {
   ao5thEl.className = "solve"
   if (no >= 5) {
     cubeTimer.computeAverage(5, no - 1)
-    ao5thEl.id = cubeTimer.averageOf5.toFixed(2)
+    ao5thEl.id = cubeTimer.averageOf5 !== "DNF" ? cubeTimer.averageOf5.toFixed(2) : "DNF"
     ao5thEl.innerHTML = ao5thEl.id
     ao5thEl.addEventListener("click", function (e) {
       createAo5Dialog(ao5thEl.id, no - 1)
@@ -157,7 +161,7 @@ function creatTimeResult(no, isFromStoreValue) {
   ao12thEl.className = "solve"
   if (no >= 12) {
     cubeTimer.computeAverage(12, no - 1)
-    ao12thEl.id = cubeTimer.averageOf12.toFixed(2)
+    ao12thEl.id = cubeTimer.averageOf12 !== "DNF" ? cubeTimer.averageOf12.toFixed(2) : "DNF"
     ao12thEl.innerHTML = ao12thEl.id
     ao12thEl.addEventListener("click", function (e) {
       createAo12Dialog(ao12thEl.id, no - 1)
@@ -187,19 +191,29 @@ function createAo12Dialog(avgTime, id) {
   let counting = 1
 
   for (let i = id - 11; i < id; i++) {
+    if (cubeTimer.timeList[i].isDNF || cubeTimer.timeList[i].time >= max) {
+      max = cubeTimer.timeList[i].isDNF ? 10000000 : cubeTimer.timeList[i].time
+      maxIndex = i
+    }
+
     if (cubeTimer.timeList[i].time <= min) {
       min = cubeTimer.timeList[i].time
       minIndex = i
-    }
-
-    if (cubeTimer.timeList[i].time >= max) {
-      max = cubeTimer.timeList[i].time
-      maxIndex = i
     }
   }
 
   let resultDisplayText = ""
   for (let i = id - 11; i <= id; i++) {
+    if (cubeTimer.timeList[i].isPlusTwo) {
+      displayTime = cubeTimer.timeList[i].time.toFixed(2) + "+"
+    } else if (cubeTimer.timeList[i].isDNF) {
+      displayTime = "DNF(" + cubeTimer.timeList[i].time.toFixed(2) + ")"
+      resultDisplayText += counting.toString() + ".\u00A0\u00A0(" + displayTime + ")\u00A0\u00A0\u00A0\u00A0\u00A0"
+      resultDisplayText += cubeTimer.timeList[i].scramble + "\n\n"
+      counting++
+      continue
+    }
+
     if (i === minIndex || i === maxIndex) {
       resultDisplayText += counting.toString() + ".\u00A0\u00A0(" + cubeTimer.timeList[i].time.toFixed(2) + ")\u00A0\u00A0\u00A0\u00A0\u00A0"
     } else {
@@ -227,30 +241,42 @@ function createAo5Dialog(avgTime, id) {
   let counting = 1
 
   for (let i = id - 4; i < id; i++) {
+
+    if (cubeTimer.timeList[i].isDNF || cubeTimer.timeList[i].time >= max) {
+      max = cubeTimer.timeList[i].isDNF ? 10000000 : cubeTimer.timeList[i].time
+      maxIndex = i
+    }
+
     if (cubeTimer.timeList[i].time <= min) {
       min = cubeTimer.timeList[i].time
       minIndex = i
-    }
-
-    if (cubeTimer.timeList[i].time >= max) {
-      max = cubeTimer.timeList[i].time
-      maxIndex = i
     }
   }
 
   let resultDisplayText = ""
   for (let i = id - 4; i <= id; i++) {
+    let displayTime = cubeTimer.timeList[i].time.toFixed(2)
+    if (cubeTimer.timeList[i].isPlusTwo) {
+      displayTime = cubeTimer.timeList[i].time.toFixed(2) + "+"
+    } else if (cubeTimer.timeList[i].isDNF) {
+      displayTime = "DNF(" + cubeTimer.timeList[i].time.toFixed(2) + ")"
+      resultDisplayText += counting.toString() + ".\u00A0\u00A0(" + displayTime + ")\u00A0\u00A0\u00A0\u00A0\u00A0"
+      resultDisplayText += cubeTimer.timeList[i].scramble + "\n\n"
+      counting++
+      continue
+    }
+
     if (i === minIndex || i === maxIndex) {
-      resultDisplayText += counting.toString() + ".\u00A0\u00A0(" + cubeTimer.timeList[i].time.toFixed(2) + ")\u00A0\u00A0\u00A0\u00A0\u00A0"
+      resultDisplayText += counting.toString() + ".\u00A0\u00A0(" + displayTime + ")\u00A0\u00A0\u00A0\u00A0\u00A0"
     } else {
-      resultDisplayText += counting.toString() + ".\u00A0\u00A0" + cubeTimer.timeList[i].time.toFixed(2) + "\u00A0\u00A0\u00A0\u00A0\u00A0"
+      resultDisplayText += counting.toString() + ".\u00A0\u00A0" + displayTime + "\u00A0\u00A0\u00A0\u00A0\u00A0"
     }
     resultDisplayText += cubeTimer.timeList[i].scramble + "\n\n"
     counting++
   }
 
   swal({
-    title: avgTime,
+    title: avgTime === "DNF" ? "DNF" : parseFloat(avgTime).toFixed(2),
     text: resultDisplayText,
     buttons: { cancel: "Cancel" }
   }).then(() => {
@@ -260,10 +286,13 @@ function createAo5Dialog(avgTime, id) {
 }
 
 function createResultDialog(id) {
-  var thisTime = cubeTimer.timeList[id].time
+  let thisTime = cubeTimer.timeList[id]
+  let displayTime = thisTime.time.toFixed(2)
+  if (thisTime.isPlusTwo) displayTime += "+"
+  else if (thisTime.isDNF) displayTime = "DNF(" + thisTime.time.toFixed(2) + ")"
   swal({
-    title: thisTime.toFixed(2),
-    text: cubeTimer.timeList[id].scramble,
+    title: displayTime,
+    text: thisTime.scramble,
     buttons: {
       delete: "Delete",
       plusTwo: "+2",
@@ -289,9 +318,23 @@ function createResultDialog(id) {
             });
           break;
         case "plusTwo":
-          if (!cubeTimer.timeList[id].isPlusTwo) {
+          if (!thisTime.isPlusTwo) {
+            if (thisTime.isDNF) {
+              thisTime.isDNF = false
+            }
             cubeTimer.timeList[id].time += 2;
             handleAfterPlusTwo(id);
+            storeValue()
+          }
+          break;
+
+        case "dnf":
+          if (!thisTime.isDNF) {
+            if (thisTime.isPlusTwo) {
+              thisTime.isPlusTwo = false
+              thisTime.time -= 2
+            }
+            handleDNF(id)
             storeValue()
           }
           break;
@@ -300,6 +343,41 @@ function createResultDialog(id) {
           swal.close();
       }
     })
+}
+
+function handleDNF(id) {
+  let numSolves = cubeTimer.timeList.length
+  resutlTable.rows[numSolves - id].cells[1].innerHTML = "DNF(" + cubeTimer.timeList[id].time.toFixed(2) + ")"
+  cubeTimer.timeList[id].isDNF = true
+
+  handleAfterPenalty()
+  reCalculateAverage(id, numSolves)
+  currentAverage(numSolves)
+}
+
+function reCalculateAverage(id, numSolves) {
+  for (let i = id - 11; i <= id + 11; i++) {
+    if (cubeTimer.timeList[i]) {
+      let cellAo5 = resutlTable.rows[numSolves - i].cells[2]
+      let cellAo12 = resutlTable.rows[numSolves - i].cells[3]
+      if (i >= 4) {
+        cubeTimer.computeAverage(5, i)
+        cellAo5.innerHTML = cubeTimer.averageOf5 !== "DNF" ? cubeTimer.averageOf5.toFixed(2) : "DNF"
+        cellAo5.removeEventListener("click", createAo5Dialog, false);
+        cellAo5.addEventListener("click", function () {
+          createAo5Dialog(cubeTimer.averageOf5, i)
+        })
+      }
+      if (i >= 11) {
+        cubeTimer.computeAverage(12, i)
+        cellAo12.innerHTML = cubeTimer.averageOf12 !== "DNF" ? cubeTimer.averageOf12.toFixed(2) : "DNF"
+        cellAo12.removeEventListener("click", createAo5Dialog, false);
+        cellAo12.addEventListener("click", function () {
+          createAo12Dialog(cubeTimer.averageOf12, i)
+        })
+      }
+    }
+  }
 }
 
 function convertStringToTime(timeAsString) {
@@ -441,7 +519,7 @@ function clearTimes() {
   averageOf5.innerHTML = "Ao5: ";
 }
 
-function handleBestSingle() {
+function handleAfterPenalty() {
   if (cubeTimer.timeList.length > 0) {
     resultTree.removeAll(cubeTimer.timeList[0])
     for (re of cubeTimer.timeList) {
@@ -485,14 +563,14 @@ function handleAfterDeleteResult(id) {
       row.cells[3].innerHTML = cubeTimer.averageOf12.toFixed(2)
       row.cells[3].removeEventListener("click", createAo12Dialog, false);
       row.cells[3].addEventListener("click", function () {
-        createAo12Dialog(cubeTimer.averageOf12.toFixed(2), numSolves - i)
+        createAo12Dialog(cubeTimer.averageOf12, numSolves - i)
       })
     } else if (numSolves >= 5) {
       cubeTimer.computeAverage(5, numSolves - i)
       row.cells[2].innerHTML = cubeTimer.averageOf5.toFixed(2)
       row.cells[2].removeEventListener("click", createAo5Dialog, false);
       row.cells[2].addEventListener("click", function () {
-        createAo5Dialog(cubeTimer.averageOf5.toFixed(2), numSolves - i)
+        createAo5Dialog(cubeTimer.averageOf5, numSolves - i)
       })
       row.cells[3].innerHTML = "-"
       row.cells[3].removeEventListener("click", createAo12Dialog, false);
@@ -507,14 +585,7 @@ function handleAfterDeleteResult(id) {
 
   numSolvesOut.innerHTML = "Solves: " + numSolves;
 
-  if (numSolves >= 5) {
-    cubeTimer.computeAverage(5, numSolves - 1)
-    averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5)
-  }
-  if (numSolves >= 12) {
-    cubeTimer.computeAverage(12, numSolves - 1)
-    averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12)
-  }
+  currentAverage(numSolves)
 }
 
 function handleAfterPlusTwo(id) {
@@ -522,40 +593,21 @@ function handleAfterPlusTwo(id) {
   resutlTable.rows[numSolves - id].cells[1].innerHTML = cubeTimer.timeList[id].time.toFixed(2) + "+"
   cubeTimer.timeList[id].isPlusTwo = true
 
-  handleBestSingle()
+  handleAfterPenalty()
+  reCalculateAverage(id, numSolves)
+  currentAverage(numSolves)
 
-  for (let i = id - 11; i <= id + 11; i++) {
-    if (cubeTimer.timeList[i]) {
-      let cellAo5 = resutlTable.rows[numSolves - i].cells[2]
-      let cellAo12 = resutlTable.rows[numSolves - i].cells[3]
-      if (i >= 4) {
-        cubeTimer.computeAverage(5, i)
-        cellAo5.innerHTML = cubeTimer.averageOf5.toFixed(2)
-        cellAo5.removeEventListener("click", createAo5Dialog, false);
-        cellAo5.addEventListener("click", function () {
-          createAo5Dialog(cubeTimer.averageOf5.toFixed(2), i)
-        })
-      }
-      if (i >= 11) {
-        cubeTimer.computeAverage(12, i)
-        cellAo12.innerHTML = cubeTimer.averageOf12.toFixed(2)
-        cellAo12.removeEventListener("click", createAo5Dialog, false);
-        cellAo12.addEventListener("click", function () {
-          createAo12Dialog(cubeTimer.averageOf12.toFixed(2), i)
-        })
-      }
-    }
-  }
+}
 
+function currentAverage(numSolves) {
   if (numSolves >= 5) {
     cubeTimer.computeAverage(5, numSolves - 1)
-    averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5)
+    averageOf5.innerHTML = "Ao5: " + cubeTimer.averageOf5 !== "DNF" ? formatTime(cubeTimer.averageOf5) : "DNF"
   }
   if (numSolves >= 12) {
     cubeTimer.computeAverage(12, numSolves - 1)
-    averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12)
+    averageOf12.innerHTML = "Ao12: " + cubeTimer.averageOf12 !== "DNF" ? formatTime(cubeTimer.averageOf12) : "DNF"
   }
-
 }
 
 //stats
@@ -565,14 +617,7 @@ function calculateStats() {
 
   creatBestSingleElement()
 
-  if (numSolves >= 5) {
-    cubeTimer.computeAverage(5, cubeTimer.timeList.length - 1)
-    averageOf5.innerHTML = "Ao5: " + formatTime(cubeTimer.averageOf5)
-  }
-  if (numSolves >= 12) {
-    cubeTimer.computeAverage(12, cubeTimer.timeList.length - 1)
-    averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12)
-  }
+  currentAverage(numSolves)
 
 }
 
@@ -616,7 +661,7 @@ function viewStoreValue(puzzleName) {
   if (storeResult) {
     cubeTimer = fromJson(storeResult)
     resultTree = new ResultTree()
-    handleBestSingle()
+    handleAfterPenalty()
 
     numSolvesOut.innerHTML = "Solves: " + cubeTimer.timeList.length;
     if (cubeTimer.averageOf12 > 0) averageOf12.innerHTML = "Ao12: " + formatTime(cubeTimer.averageOf12);
