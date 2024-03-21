@@ -6,5 +6,8 @@ class Solve {
         this.isDNF = isDNF
         this.left = null
         this.right = null
+        // this.originalTime = time
     }
 }
+
+module.exports = Solve

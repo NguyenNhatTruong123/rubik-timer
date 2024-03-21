@@ -1,3 +1,10 @@
+const CubeTimer = require('./Cube')
+const ResultTree = require('./timeResultTree')
+const Solve = require('./solve')
+
+import { ScrambleGenerator2x2, ScrambleGenerator3x3, ScrambleGenerator4x4, ScrambleGenerator5x5, ScrambleGenerator6x6, ScrambleGenerator7x7 } from "./scrambler"
+import { CUBE_2X2X2, CUBE_3X3X3, CUBE_4X4X4, CUBE_5X5X5, CUBE_6X6X6, CUBE_7X7X7, CUBE_LABEL, dnfTime } from "./constant"
+
 var msDisplay = document.querySelector("#milliSec");
 var secDisplay = document.querySelector("#second");
 var minDisplay = document.querySelector("#minute");
@@ -143,13 +150,13 @@ function creatTimeResult(no, isFromStoreValue) {
     ao5thEl.id = cubeTimer.averageOf5 !== "DNF" ? cubeTimer.averageOf5.toFixed(2) : "DNF"
     ao5thEl.innerHTML = ao5thEl.id
     ao5thEl.addEventListener("click", function (e) {
-      createAo5Dialog(ao5thEl.id, no - 1)
+      createAverageDialog(ao5thEl.id, no - 1, 5)
     })
 
     minAo5.innerHTML = "Best Ao5: " + cubeTimer.bestAo5[0].toFixed(2)
     minAo5.id = cubeTimer.bestAo5[1]
     minAo5.addEventListener("click", function (e) {
-      createAo5Dialog(cubeTimer.bestAo5[0], cubeTimer.bestAo5[1])
+      createAverageDialog(cubeTimer.bestAo5[0], cubeTimer.bestAo5[1], 5)
     })
 
   } else {
@@ -164,13 +171,13 @@ function creatTimeResult(no, isFromStoreValue) {
     ao12thEl.id = cubeTimer.averageOf12 !== "DNF" ? cubeTimer.averageOf12.toFixed(2) : "DNF"
     ao12thEl.innerHTML = ao12thEl.id
     ao12thEl.addEventListener("click", function (e) {
-      createAo12Dialog(ao12thEl.id, no - 1)
+      createAverageDialog(ao12thEl.id, no - 1, 12)
     })
 
     minAo12.innerHTML = "Best Ao12: " + cubeTimer.bestAo12[0].toFixed(2)
     minAo12.id = cubeTimer.bestAo12[1]
     minAo12.addEventListener("click", function (e) {
-      createAo12Dialog(cubeTimer.bestAo12[0], cubeTimer.bestAo12[1])
+      createAverageDialog(cubeTimer.bestAo12[0], cubeTimer.bestAo12[1], 12)
     })
 
   } else {
@@ -182,7 +189,7 @@ function creatTimeResult(no, isFromStoreValue) {
 
 }
 
-function createAo12Dialog(avgTime, id) {
+function createAverageDialog(avgTime, id, avgCounting) {
   let min = cubeTimer.timeList[id].time
   let minIndex = id
   let max = cubeTimer.timeList[id].time
@@ -190,60 +197,10 @@ function createAo12Dialog(avgTime, id) {
 
   let counting = 1
 
-  for (let i = id - 11; i < id; i++) {
-    if (cubeTimer.timeList[i].isDNF || cubeTimer.timeList[i].time >= max) {
-      max = cubeTimer.timeList[i].isDNF ? 10000000 : cubeTimer.timeList[i].time
-      maxIndex = i
-    }
-
-    if (cubeTimer.timeList[i].time <= min) {
-      min = cubeTimer.timeList[i].time
-      minIndex = i
-    }
-  }
-
-  let resultDisplayText = ""
-  for (let i = id - 11; i <= id; i++) {
-    if (cubeTimer.timeList[i].isPlusTwo) {
-      displayTime = cubeTimer.timeList[i].time.toFixed(2) + "+"
-    } else if (cubeTimer.timeList[i].isDNF) {
-      displayTime = "DNF(" + cubeTimer.timeList[i].time.toFixed(2) + ")"
-      resultDisplayText += counting.toString() + ".\u00A0\u00A0(" + displayTime + ")\u00A0\u00A0\u00A0\u00A0\u00A0"
-      resultDisplayText += cubeTimer.timeList[i].scramble + "\n\n"
-      counting++
-      continue
-    }
-
-    if (i === minIndex || i === maxIndex) {
-      resultDisplayText += counting.toString() + ".\u00A0\u00A0(" + cubeTimer.timeList[i].time.toFixed(2) + ")\u00A0\u00A0\u00A0\u00A0\u00A0"
-    } else {
-      resultDisplayText += counting.toString() + ".\u00A0\u00A0" + cubeTimer.timeList[i].time.toFixed(2) + "\u00A0\u00A0\u00A0\u00A0\u00A0"
-    }
-    resultDisplayText += cubeTimer.timeList[i].scramble + "\n\n"
-    counting++
-  }
-
-  swal({
-    title: avgTime,
-    text: resultDisplayText,
-    buttons: { cancel: "Cancel" }
-  }).then(() => {
-    swal.close()
-  })
-}
-
-function createAo5Dialog(avgTime, id) {
-  let min = cubeTimer.timeList[id].time
-  let minIndex = id
-  let max = cubeTimer.timeList[id].time
-  let maxIndex = id
-
-  let counting = 1
-
-  for (let i = id - 4; i < id; i++) {
+  for (let i = id - avgCounting + 1; i < id; i++) {
 
     if (cubeTimer.timeList[i].isDNF || cubeTimer.timeList[i].time >= max) {
-      max = cubeTimer.timeList[i].isDNF ? 10000000 : cubeTimer.timeList[i].time
+      max = cubeTimer.timeList[i].isDNF ? dnfTime : cubeTimer.timeList[i].time
       maxIndex = i
     }
 
@@ -363,17 +320,17 @@ function reCalculateAverage(id, numSolves) {
       if (i >= 4) {
         cubeTimer.computeAverage(5, i)
         cellAo5.innerHTML = cubeTimer.averageOf5 !== "DNF" ? cubeTimer.averageOf5.toFixed(2) : "DNF"
-        cellAo5.removeEventListener("click", createAo5Dialog, false);
+        cellAo5.removeEventListener("click", createAverageDialog, false);
         cellAo5.addEventListener("click", function () {
-          createAo5Dialog(cubeTimer.averageOf5, i)
+          createAverageDialog(cubeTimer.averageOf5, i, 5)
         })
       }
       if (i >= 11) {
         cubeTimer.computeAverage(12, i)
         cellAo12.innerHTML = cubeTimer.averageOf12 !== "DNF" ? cubeTimer.averageOf12.toFixed(2) : "DNF"
-        cellAo12.removeEventListener("click", createAo5Dialog, false);
+        cellAo12.removeEventListener("click", createAverageDialog, false);
         cellAo12.addEventListener("click", function () {
-          createAo12Dialog(cubeTimer.averageOf12, i)
+          createAverageDialog(cubeTimer.averageOf12, i, 12)
         })
       }
     }
@@ -400,8 +357,9 @@ function createResultList() {
     if (solveInfo.time < bestSingle.time) {
       bestSingle = solveInfo
       swal("Congratulations", "You just set a new PB.", "success", {
-        buttons: true,
-        timer: 10000,
+        buttons: { ok: "OK" }
+      }).then(() => {
+        swal.close()
       });
     }
   }
@@ -517,20 +475,22 @@ function clearTimes() {
   bestOut.innerHTML = "Best: ";
   averageOf12.innerHTML = "Ao12: ";
   averageOf5.innerHTML = "Ao5: ";
+  minAo5.innerHTML = "Best Ao5: "
+  minAo12.innerHTML = "Best Ao12: "
 }
 
 function handleAfterPenalty() {
   if (cubeTimer.timeList.length > 0) {
     resultTree.removeAll(cubeTimer.timeList[0])
-    for (re of cubeTimer.timeList) {
+    for (let re of cubeTimer.timeList) {
       resultTree.insert(re)
     }
     bestSingle = resultTree.findMinNode(cubeTimer.timeList[0])
-    creatBestSingleElement()
+    createBestSingleElement()
   }
 }
 
-function creatBestSingleElement() {
+function createBestSingleElement() {
   if (cubeTimer.timeList.length > 0) {
     bestOut.innerHTML = "Best: " + formatTime(bestSingle.time)
     bestOut.addEventListener("click", function () {
@@ -561,30 +521,31 @@ function handleAfterDeleteResult(id) {
     if (numSolves >= 12) {
       cubeTimer.computeAverage(12, numSolves - i)
       row.cells[3].innerHTML = cubeTimer.averageOf12.toFixed(2)
-      row.cells[3].removeEventListener("click", createAo12Dialog, false);
+      row.cells[3].removeEventListener("click", createAverageDialog, false);
       row.cells[3].addEventListener("click", function () {
-        createAo12Dialog(cubeTimer.averageOf12, numSolves - i)
+        createAverageDialog(cubeTimer.averageOf12, numSolves - i, 12)
       })
     } else if (numSolves >= 5) {
       cubeTimer.computeAverage(5, numSolves - i)
       row.cells[2].innerHTML = cubeTimer.averageOf5.toFixed(2)
-      row.cells[2].removeEventListener("click", createAo5Dialog, false);
+      row.cells[2].removeEventListener("click", createAverageDialog, false);
       row.cells[2].addEventListener("click", function () {
-        createAo5Dialog(cubeTimer.averageOf5, numSolves - i)
+        createAverageDialog(cubeTimer.averageOf5, numSolves - i, 5)
       })
       row.cells[3].innerHTML = "-"
-      row.cells[3].removeEventListener("click", createAo12Dialog, false);
+      row.cells[3].removeEventListener("click", createAverageDialog, false);
     } else {
       row.cells[2].innerHTML = "-"
       row.cells[3].innerHTML = "-"
-      row.cells[3].removeEventListener("click", createAo12Dialog, false);
-      row.cells[2].removeEventListener("click", createAo5Dialog, false);
+      row.cells[3].removeEventListener("click", createAverageDialog, false);
+      row.cells[2].removeEventListener("click", createAverageDialog, false);
     }
 
   }
 
   numSolvesOut.innerHTML = "Solves: " + numSolves;
 
+  handleAfterPenalty()
   currentAverage(numSolves)
 }
 
@@ -596,17 +557,18 @@ function handleAfterPlusTwo(id) {
   handleAfterPenalty()
   reCalculateAverage(id, numSolves)
   currentAverage(numSolves)
-
 }
 
 function currentAverage(numSolves) {
+  averageOf5.innerHTML = "Ao5: "
+  averageOf12.innerHTML = "Ao12: "
   if (numSolves >= 5) {
     cubeTimer.computeAverage(5, numSolves - 1)
-    averageOf5.innerHTML = "Ao5: " + cubeTimer.averageOf5 !== "DNF" ? formatTime(cubeTimer.averageOf5) : "DNF"
+    averageOf5.innerHTML += cubeTimer.averageOf5 !== "DNF" ? formatTime(cubeTimer.averageOf5) : "DNF"
   }
   if (numSolves >= 12) {
     cubeTimer.computeAverage(12, numSolves - 1)
-    averageOf12.innerHTML = "Ao12: " + cubeTimer.averageOf12 !== "DNF" ? formatTime(cubeTimer.averageOf12) : "DNF"
+    averageOf12.innerHTML += cubeTimer.averageOf12 !== "DNF" ? formatTime(cubeTimer.averageOf12) : "DNF"
   }
 }
 
@@ -615,10 +577,8 @@ function calculateStats() {
   let numSolves = cubeTimer.timeList.length
   numSolvesOut.innerHTML = "Solves: " + numSolves;
 
-  creatBestSingleElement()
-
+  createBestSingleElement()
   currentAverage(numSolves)
-
 }
 
 function formatTime(t) {
@@ -639,13 +599,15 @@ function formatTime(t) {
 }
 
 document.addEventListener("keydown", (e) => {
-  if (e.code === "Space") {
+  let popup = document.getElementsByClassName("swal-overlay--show-modal")
+  if (e.code === "Space" && popup.length === 0) {
     displayTime.style.color = "brown"
   }
 });
 
 document.addEventListener("keyup", (e) => {
-  if (e.code === "Space") {
+  let popup = document.getElementsByClassName("swal-overlay--show-modal")
+  if (e.code === "Space" && popup.length === 0) {
     displayTime.style.color = ""
     currentScramble = scramble.innerText
     run();
@@ -674,7 +636,7 @@ function viewStoreValue(puzzleName) {
 }
 
 function newCuberTimer() {
-  return new CubeTimer(puzzleSelected, [], 0, 0, resultTree)
+  return new CubeTimer(puzzleSelected, [], 0, 0, new ResultTree())
 }
 
 function fromJson(jData) {

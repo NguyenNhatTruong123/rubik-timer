@@ -31,3 +31,5 @@ function randomMove(scramble, moves, startIndex, endIndex, lastMoveIndex, prevLa
 
     return [scramble, lastMoveIndex, prevLastIndex]
 }
+
+export { checkValidNextMove, randomMove }

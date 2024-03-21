@@ -1,3 +1,5 @@
+const { dnfTime } = require("./constant")
+
 class CubeTimer {
     constructor(cubeName, timeList, averageOf5, averageOf12, resultTree) {
         this.cubeName = cubeName
@@ -30,7 +32,7 @@ class CubeTimer {
             let time = this.timeList[index].time
             if (this.timeList[index].isDNF) {
                 countDNF++
-                time = 10000000
+                time = dnfTime
             }
 
             if (countDNF === 2) {
@@ -79,7 +81,9 @@ class CubeTimer {
             bestAo12: this.bestAo12,
             bestAo5: this.bestAo5,
             bestAo12: this.bestAo12,
-            bestStackTraceIndex: this.resultTree
+            resultTree: this.resultTree
         });
     }
 }
+
+module.exports = CubeTimer

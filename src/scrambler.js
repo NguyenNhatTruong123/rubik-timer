@@ -1,5 +1,5 @@
-// import { move2x2x2, move3x3x3, move4x4x4, move5x5x5, move6x6x6, move7x7x7 } from "./constant"
-// import { checkValidNextMove, randomMove } from "./utilities"
+import { move2x2x2, move3x3x3, move4x4x4, move5x5x5, move6x6x6, move7x7x7 } from "./constant"
+import { checkValidNextMove, randomMove } from "./utilities"
 
 // 2x2 scram
 function ScrambleGenerator2x2() {
@@ -120,3 +120,5 @@ function ScrambleGenerator7x7() {
   output.innerHTML = `${scramble}`;
   return scramble;
 }
+
+export { ScrambleGenerator2x2, ScrambleGenerator3x3, ScrambleGenerator4x4, ScrambleGenerator5x5, ScrambleGenerator6x6, ScrambleGenerator7x7 }
