@@ -1,7 +1,7 @@
 const oppositeFace = [
-    ["R", "R'", "R2", "L", "L'", "L2", "Rw", "Rw'", "Rw2", "Lw", "Lw'", "Lw2"],
-    ["U", "U'", "U2", "D", "D'", "D2", "Uw", "Uw'", "Uw2", "Dw", "Dw'", "Dw2"],
-    ["F", "F'", "F2", "B", "B'", "B2", "Fw", "Fw'", "Fw2", "Bw", "Bw'", "Bw2"]
+    ["R", "R'", "R2", "r", "r'", "r2", "L", "L'", "L2", "l", "l'", "l2", "Rw", "Rw'", "Rw2", "Lw", "Lw'", "Lw2"],
+    ["U", "U'", "U2", "u", "u'", "u2", "D", "D'", "D2", "d", "d'", "d2", "Uw", "Uw'", "Uw2", "Dw", "Dw'", "Dw2"],
+    ["F", "F'", "F2", "f", "f'", "f2", "B", "B'", "B2", "b", "b'", "b2", "Fw", "Fw'", "Fw2", "Bw", "Bw'", "Bw2"]
 ]
 
 function checkValidNextMove(currentMove, lastMove, prevLastMove) {
