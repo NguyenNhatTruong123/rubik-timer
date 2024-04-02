@@ -44,11 +44,13 @@ const movePyram = ["R", "L", "U", "B", "R'", "L'", "U'", "B'", "r", "l", "u", "b
 
 const moveSkewb = ["R", "L", "U", "B", "R'", "L'", "U'", "B'"]
 
+const moveMegaminx = ["R++", "R--", "D++", "D--", "U ", "U'"]
+
 const dnfTime = 1e6
 
 export {
     CUBE_2X2X2, CUBE_3X3X3, CUBE_4X4X4, CUBE_5X5X5, CUBE_6X6X6, CUBE_7X7X7,
     CUBE_CLOCK, CUBE_MEGAMINX, CUBE_PYRAMINX, CUBE_SKEWB, CUBE_SQUARE, CUBE_LABEL,
     move2x2x2, move3x3x3, move4x4x4, move5x5x5, move6x6x6, move7x7x7, dnfTime,
-    movePyram, moveSkewb
+    movePyram, moveSkewb, moveMegaminx
 }

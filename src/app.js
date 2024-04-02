@@ -5,9 +5,10 @@ const Solve = require('./solve')
 import {
   ScrambleGenerator2x2, ScrambleGenerator3x3, ScrambleGenerator4x4,
   ScrambleGenerator5x5, ScrambleGenerator6x6, ScrambleGenerator7x7,
+  ScrambleGeneratorMegaminx,
   ScrambleGeneratorPyraminx, ScrambleGeneratorSkewb
 } from "./scrambler"
-import { CUBE_2X2X2, CUBE_3X3X3, CUBE_4X4X4, CUBE_5X5X5, CUBE_6X6X6, CUBE_7X7X7, CUBE_LABEL, CUBE_PYRAMINX, CUBE_SKEWB, dnfTime } from "./constant"
+import { CUBE_2X2X2, CUBE_3X3X3, CUBE_4X4X4, CUBE_5X5X5, CUBE_6X6X6, CUBE_7X7X7, CUBE_LABEL, CUBE_MEGAMINX, CUBE_PYRAMINX, CUBE_SKEWB, dnfTime } from "./constant"
 
 var msDisplay = document.querySelector("#milliSec");
 var secDisplay = document.querySelector("#second");
@@ -395,6 +396,9 @@ function scrambleGenerator(isNewSession) {
     case CUBE_SKEWB:
       currentScramble = ScrambleGeneratorSkewb();
       break;
+    case CUBE_MEGAMINX:
+      currentScramble = ScrambleGeneratorMegaminx()
+      break;
     default:
       currentScramble = ScrambleGenerator3x3();
       puzzleSelected = CUBE_3X3X3
@@ -410,7 +414,7 @@ function scrambleGenerator(isNewSession) {
 
 function drawScramble(scram) {
   scrambleGeneratorEl.setAttribute("event", puzzleSelected)
-  scrambleGeneratorEl.setAttribute("scramble", scram)
+  scrambleGeneratorEl.setAttribute("scramble", scram.replaceAll("&nbsp;", " "))
   scrambleGeneratorEl.setAttribute("visualization", "2D")
 }
 
@@ -443,6 +447,9 @@ puzzle.addEventListener("change", function () {
       break;
     case CUBE_PYRAMINX:
       currentScramble = ScrambleGeneratorPyraminx()
+      break;
+    case CUBE_MEGAMINX:
+      currentScramble = ScrambleGeneratorMegaminx()
       break;
     case CUBE_SKEWB:
       currentScramble = ScrambleGeneratorSkewb();

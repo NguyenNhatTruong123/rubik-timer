@@ -129,11 +129,11 @@
 }
 
 #scramble {
-    margin-top: 2%;
     word-wrap: break-word;
     font-family: monospace;
     font-weight: bold;
     font-size: 1.7rem;
+    white-space: pre-wrap;
 }
 
 #displayTime {

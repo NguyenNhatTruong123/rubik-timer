@@ -1,4 +1,4 @@
-import { move2x2x2, move3x3x3, move4x4x4, move5x5x5, move6x6x6, move7x7x7, movePyram, moveSkewb } from "./constant"
+import { move2x2x2, move3x3x3, move4x4x4, move5x5x5, move6x6x6, move7x7x7, moveMegaminx, movePyram, moveSkewb } from "./constant"
 import { checkValidNextMove, randomMove } from "./utilities"
 
 // 2x2 scram
@@ -192,7 +192,29 @@ function ScrambleGeneratorSkewb() {
   return scramble;
 }
 
+function ScrambleGeneratorMegaminx() {
+  let scramble = ""
+  var output = document.getElementById("scramble");
+  let randomIndex = 0
+
+  for (var i = 0; i < 7; i++) {
+    scramble += " "
+    for (var j = 1; j <= 10; j++) {
+      if (j % 2 == 0) {
+        randomIndex = Math.floor(Math.random() * 2 + 2)
+      } else {
+        randomIndex = Math.floor(Math.random() * 2)
+      }
+      scramble += moveMegaminx[randomIndex] + " "
+    }
+    scramble += moveMegaminx[Math.floor(Math.random() * 2 + 4)] + "&nbsp;\n"
+
+  }
+  output.innerHTML = `${scramble}`;
+  return scramble;
+}
+
 export {
   ScrambleGenerator2x2, ScrambleGenerator3x3, ScrambleGenerator4x4, ScrambleGenerator5x5, ScrambleGenerator6x6, ScrambleGenerator7x7,
-  ScrambleGeneratorPyraminx, ScrambleGeneratorSkewb
+  ScrambleGeneratorPyraminx, ScrambleGeneratorSkewb, ScrambleGeneratorMegaminx
 }
