@@ -5,10 +5,11 @@ const Solve = require('./solve')
 import {
   ScrambleGenerator2x2, ScrambleGenerator3x3, ScrambleGenerator4x4,
   ScrambleGenerator5x5, ScrambleGenerator6x6, ScrambleGenerator7x7,
+  ScrambleGeneratorClock,
   ScrambleGeneratorMegaminx,
-  ScrambleGeneratorPyraminx, ScrambleGeneratorSkewb
+  ScrambleGeneratorPyraminx, ScrambleGeneratorSkewb, ScrambleGeneratorSquare1
 } from "./scrambler"
-import { CUBE_2X2X2, CUBE_3X3X3, CUBE_4X4X4, CUBE_5X5X5, CUBE_6X6X6, CUBE_7X7X7, CUBE_LABEL, CUBE_MEGAMINX, CUBE_PYRAMINX, CUBE_SKEWB, dnfTime } from "./constant"
+import { CUBE_2X2X2, CUBE_3X3X3, CUBE_4X4X4, CUBE_5X5X5, CUBE_6X6X6, CUBE_7X7X7, CUBE_CLOCK, CUBE_LABEL, CUBE_MEGAMINX, CUBE_PYRAMINX, CUBE_SKEWB, CUBE_SQUARE, dnfTime } from "./constant"
 
 var msDisplay = document.querySelector("#milliSec");
 var secDisplay = document.querySelector("#second");
@@ -399,6 +400,12 @@ function scrambleGenerator(isNewSession) {
     case CUBE_MEGAMINX:
       currentScramble = ScrambleGeneratorMegaminx()
       break;
+    case CUBE_SQUARE:
+      currentScramble = ScrambleGeneratorSquare1()
+      break;
+    case CUBE_CLOCK:
+      currentScramble = ScrambleGeneratorClock()
+      break;
     default:
       currentScramble = ScrambleGenerator3x3();
       puzzleSelected = CUBE_3X3X3
@@ -451,8 +458,14 @@ puzzle.addEventListener("change", function () {
     case CUBE_MEGAMINX:
       currentScramble = ScrambleGeneratorMegaminx()
       break;
+    case CUBE_SQUARE:
+      currentScramble = ScrambleGeneratorSquare1()
+      break;
     case CUBE_SKEWB:
       currentScramble = ScrambleGeneratorSkewb();
+      break;
+    case CUBE_CLOCK:
+      currentScramble = ScrambleGeneratorClock()
       break;
   }
 
